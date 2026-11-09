@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>mbsh: namespace of Characters of the Mahabharata</title>
+<meta name="description" content="Namespace document for https://mahabharata.tanay.uk/shapes#"/>
+<link rel="alternate" type="text/turtle" href="mahabharata_characters.ttl" title="The concept scheme (RDF Turtle)"/>
+<link rel="alternate" type="text/turtle" href="shapes.ttl" title="SHACL shapes (RDF Turtle)"/>
+<link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/"/>
+<meta name="robots" content="noindex,follow"/>
+<script>
+(function () {
+  var h = window.location.hash;
+  var base = window.location.protocol === "file:" ? "./index.html" : "./";
+  window.location.replace(base + (h.length > 1 ? h : "#shapes"));
+})();
+</script>
+<style>
+html { background: #fff; }
+body { margin: 0 auto; padding: 1.5em 2em 4em; max-width: 64em; color: #1a1a1a; line-height: 1.5; font-size: 16px;
+  font-family: "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Noto Sans Devanagari", sans-serif; }
+a { color: #0645ad; text-decoration: none; } a:hover { text-decoration: underline; } a:visited { color: #5a3e99; }
+h1, h2, h3 { color: #005a9c; font-weight: 600; line-height: 1.25; text-align: left; }
+h1 { font-size: 2em; margin: 0.6em 0 0.2em; }
+h2 { font-size: 1.5em; margin-top: 2.2em; padding-bottom: 0.2em; border-bottom: 1px solid #d0d7de; }
+h3 { font-size: 1.2em; margin-top: 1.8em; }
+h4 { font-size: 1em; margin: 1.6em 0 0.4em; }
+.secno { color: #005a9c; margin-right: 0.35em; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+pre { background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 4px; padding: 0.8em 1em; overflow-x: auto;
+  line-height: 1.4; }
+blockquote { margin: 1em 0; padding: 0.6em 1em; border-left: 4px solid #d0d7de; }
+hr { border: 0; border-top: 1px solid #d0d7de; margin: 1.5em 0; }
+.head .badge { display: inline-block; margin-top: 1.5em; padding: 0.1em 0.6em; font-size: 0.8em; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #005a9c; border: 1px solid #005a9c; border-radius: 3px; }
+.head h2 { margin: 0.2em 0 1em; border: 0; color: #1a1a1a; font-size: 1.15em; font-weight: normal; }
+.head dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.25em 1.2em; margin: 1em 0; }
+.head dt { font-weight: 600; } .head dd { margin: 0; }
+ol.toc, ol.toc ol { list-style: none; padding-left: 0; } ol.toc ol { padding-left: 1.6em; } ol.toc li { margin: 0.15em 0; }
+table { width: 100%; margin: 1em 0; border-collapse: collapse; font-size: 0.95em; }
+table.simple th { padding: 0.4em 0.6em; background: #005a9c; color: #fff; text-align: left; }
+table.simple td { padding: 0.4em 0.6em; border-bottom: 1px solid #d0d7de; vertical-align: top; }
+table.simple tr:nth-child(even) td { background: #f6f8fa; }
+.term { margin: 1.4em 0; border: 1px solid #d0d7de; border-left: 5px solid var(--c, #005a9c); border-radius: 4px; }
+.term h4 { margin: 0; padding: 0.5em 0.8em; background: var(--bg, #eef3f8); border-bottom: 1px solid #d0d7de; }
+.term .kind { margin-right: 0.6em; font-size: 0.75em; letter-spacing: 0.06em; text-transform: uppercase; color: #444; }
+.term .lbl { font-size: 1.1em; }
+.term .qn, .term .sa { margin-left: 0.6em; font-weight: normal; color: #444; }
+.term .self { float: right; color: #999; font-weight: normal; }
+table.definition { margin: 0; }
+table.definition th { width: 11em; padding: 0.35em 0.8em; text-align: left; font-weight: 600; color: #444;
+  vertical-align: top; border-top: 1px solid #eee; }
+table.definition td { padding: 0.35em 0.8em; vertical-align: top; border-top: 1px solid #eee; }
+table.definition tr:first-child th, table.definition tr:first-child td { border-top: 0; }
+table.definition ol, table.definition ul { margin: 0; padding-left: 1.4em; }
+.scheme, .ontology { --c: #005a9c; --bg: #e6eef7; } .class { --c: #1565c0; --bg: #e3f2fd; }
+.property { --c: #6a1b9a; --bg: #f3e5f5; } .grouping { --c: #2e7d32; --bg: #e8f5e9; }
+.character { --c: #d4a017; --bg: #fff8e1; } .collection { --c: #00796b; --bg: #e0f2f1; }
+.shape, .shapes { --c: #546e7a; --bg: #eceff1; }
+
+ul.legend { list-style: none; padding: 0; } ul.legend li { display: inline-block; margin: 0 1.2em 0.3em 0; }
+.swatch { display: inline-block; width: 1em; height: 1em; margin-right: 0.4em; vertical-align: -0.15em;
+  background: var(--bg); border-left: 4px solid var(--c); border-radius: 2px; }
+.lt { display: inline-block; margin-right: 0.35em; padding: 0 0.35em; font-family: monospace; font-size: 0.72em;
+  color: #555; background: #f1f3f4; border-radius: 3px; vertical-align: 0.1em; }
+.inf { font-weight: normal; font-size: 0.8em; font-style: italic; color: #777; }
+.msg { font-style: italic; color: #555; }
+.turtle { white-space: nowrap; }
+ul.tree, ul.tree ul { list-style: none; padding-left: 1.4em; border-left: 1px dotted #bbb; }
+ul.tree { padding-left: 0; border: 0; } ul.tree li { margin: 0.15em 0; } ul.tree li.grouping > a { font-weight: 600; }
+.count { font-size: 0.85em; color: #777; } .sa { color: #555; } .also { font-size: 0.85em; font-style: italic; color: #777; }
+.letters { line-height: 2; } .letters a { display: inline-block; min-width: 1.6em; margin: 0 0.1em; text-align: center;
+  border: 1px solid #d0d7de; border-radius: 3px; }
+.letter { margin: 2em 0 0; font-size: 1.4em; font-weight: 600; color: #005a9c; border-bottom: 2px solid #005a9c; }
+figure { margin: 1.5em 0; } figure svg { width: 100%; height: auto; }
+figcaption { margin-top: 0.4em; font-size: 0.9em; color: #444; }
+svg .box rect { fill: #fff; stroke: #005a9c; stroke-width: 1.5; } svg .box.ext rect { stroke: #777; stroke-dasharray: 5 4; }
+svg .box text { font-size: 12px; fill: #1a1a1a; text-anchor: middle; }
+svg .box .t1 { font-size: 13px; font-weight: 600; fill: #005a9c; } svg .box .t2 { font-size: 11px; fill: #444; }
+svg .edge { fill: none; stroke: #444; stroke-width: 1.3; marker-end: url(#arrow); } svg .edge.dashed { stroke-dasharray: 5 4; }
+svg .lbl { font-size: 11px; fill: #333; paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
+dl.refs dt { margin-top: 0.6em; font-weight: 600; } dl.refs dd { margin: 0 0 0 2em; }
+footer { margin-top: 3em; padding-top: 1em; font-size: 0.85em; color: #666; border-top: 1px solid #d0d7de; }
+@media (max-width: 40em) { body { padding: 1em; } table.definition th { width: 7em; } .head dl { display: block; } }
+</style>
+</head>
+<body>
+<div class="head"><p class="badge">Namespace document</p>
+<h1>Namespace <code>mbsh:</code></h1>
+<h2>https://mahabharata.tanay.uk/shapes#</h2></div>
+<p>This is the namespace document for <code>https://mahabharata.tanay.uk/shapes#</code>, the SHACL shapes of the SKOS concept scheme <i>Characters of the Mahabharata</i>. Each term is described in the <a href="./">specification</a>; this page forwards a browser to the entry named by the fragment of the IRI, so <code>https://mahabharata.tanay.uk/shapes#ConceptShape</code> opens the entry for <a href="./#ConceptShape">Concept</a>. The data is served as RDF Turtle at <a href="mahabharata_characters.ttl">mahabharata_characters.ttl</a> and the shapes at <a href="shapes.ttl">shapes.ttl</a>.</p>
+<h2>Terms</h2>
+<ul><li><a href="./#ConceptShape">Concept</a> <code>mbsh:ConceptShape</code></li><li><a href="./#CollectionShape">Collection</a> <code>mbsh:CollectionShape</code></li><li><a href="./#OrderedCollectionShape">Ordered collection</a> <code>mbsh:OrderedCollectionShape</code></li><li><a href="./#SchemeShape">Scheme</a> <code>mbsh:SchemeShape</code></li><li><a href="./#CharacterShape">Character</a> <code>mbsh:CharacterShape</code></li><li><a href="./#GroupingShape">Grouping</a> <code>mbsh:GroupingShape</code></li><li><a href="./#CharacterRelationSubjectShape">Character relation subject</a> <code>mbsh:CharacterRelationSubjectShape</code></li><li><a href="./#InverseNotMaterialisedShape">Inverse not materialised</a> <code>mbsh:InverseNotMaterialisedShape</code></li><li><a href="./#SymmetricOnceShape">Symmetric once</a> <code>mbsh:SymmetricOnceShape</code></li><li><a href="./#NoSelfOrCycleShape">No self or cycle</a> <code>mbsh:NoSelfOrCycleShape</code></li></ul>
+</body>
+</html>

@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use this concept scheme, please cite it as below."
+title: "Characters of the Mahabharata: a SKOS concept scheme"
+type: dataset
+version: 1.0.0
+date-released: 2026-11-08
+license: CC-BY-SA-4.0
+url: "https://mahabharata.tanay.uk/"
+repository-code: "https://github.com/ImTanay/mahabharata"
+abstract: >-
+  A SKOS concept scheme of the characters of the Mahabharata. Each character is
+  a skos:Concept placed under its lineage, royal house, order or class of being,
+  with kinship and narrative relations as sub-properties of skos:related, labels
+  in English, Devanagari and IAST, and mappings to Wikidata and DBpedia. Content
+  follows the English Wikipedia article Mahabharata and the character articles
+  it links to. Validated with SHACL.
+authors:
+  - family-names: Aggarwal
+    given-names: Tanay
+keywords:
+  - SKOS
+  - knowledge organization system
+  - ontology
+  - Mahabharata
+  - Hindu epics
+  - linked data
+  - SHACL
+  - Wikidata
+references:
+  - type: article
+    title: "Mahabharata"
+    url: "https://en.wikipedia.org/wiki/Mahabharata"
+    publisher:
+      name: "Wikipedia, The Free Encyclopedia"
+    license: CC-BY-SA-4.0
+  - type: standard
+    title: "SKOS Simple Knowledge Organization System Reference"
+    url: "https://www.w3.org/TR/skos-reference/"
+    publisher:
+      name: "World Wide Web Consortium"
+    date-released: 2009-08-18

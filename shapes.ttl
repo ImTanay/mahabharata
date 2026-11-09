@@ -1,0 +1,298 @@
+# SHACL shapes for mahabharata_characters.ttl
+#
+# Two layers:
+#   1. SKOS integrity conditions from the SKOS Reference that SHACL can state
+#      (S9, S13, S14, S27, S36, S37, S46), as they apply to this scheme.
+#   2. Conventions of this scheme: label languages, the character/grouping
+#      split, direction and typing of the mbhx: relations, mapping targets.
+#
+# Run with pyshacl and RDFS inference so that rdfs:subPropertyOf and
+# rdfs:subClassOf apply: python validate.py
+
+@prefix sh:      <http://www.w3.org/ns/shacl#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix mb:      <https://mahabharata.tanay.uk/> .
+@prefix mbh:     <https://mahabharata.tanay.uk/characters#> .
+@prefix mbhx:    <https://mahabharata.tanay.uk/schema#> .
+@prefix mbsh:    <https://mahabharata.tanay.uk/shapes#> .
+
+# ---------------------------------------------------------------------------
+# 1. SKOS integrity
+# ---------------------------------------------------------------------------
+
+mbsh:ConceptShape a sh:NodeShape ;
+    sh:targetClass skos:Concept ;
+    rdfs:comment "Labels, documentation and scheme membership of every concept."@en ;
+    # S14: at most one prefLabel per language tag; this scheme requires English.
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype rdf:langString ;
+        sh:minCount 1 ;
+        sh:uniqueLang true ;
+        sh:message "Every concept has language-tagged prefLabels, at most one per language (S14)."@en ;
+    ] ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:qualifiedValueShape [ sh:languageIn ( "en" ) ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:message "Every concept has an English prefLabel."@en ;
+    ] ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:languageIn ( "en" "sa-Deva" "sa-Latn" ) ;
+        sh:message "prefLabel languages are limited to en, sa-Deva and sa-Latn."@en ;
+    ] ;
+    sh:property [
+        sh:path skos:altLabel ;
+        sh:datatype rdf:langString ;
+        sh:languageIn ( "en" "sa-Deva" "sa-Latn" ) ;
+    ] ;
+    sh:property [
+        sh:path skos:hiddenLabel ;
+        sh:datatype rdf:langString ;
+        sh:languageIn ( "en" ) ;
+        sh:message "hiddenLabel holds English spelling variants only."@en ;
+    ] ;
+    # S13: prefLabel, altLabel and hiddenLabel are pairwise disjoint.
+    sh:property [ sh:path skos:prefLabel ;   sh:disjoint skos:altLabel ;    sh:message "S13: a prefLabel is also an altLabel."@en ] ;
+    sh:property [ sh:path skos:prefLabel ;   sh:disjoint skos:hiddenLabel ; sh:message "S13: a prefLabel is also a hiddenLabel."@en ] ;
+    sh:property [ sh:path skos:altLabel ;    sh:disjoint skos:hiddenLabel ; sh:message "S13: an altLabel is also a hiddenLabel."@en ] ;
+    sh:property [
+        sh:path skos:definition ;
+        sh:minCount 1 ;
+        sh:datatype rdf:langString ;
+        sh:qualifiedValueShape [ sh:languageIn ( "en" ) ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:message "Every concept has an English definition."@en ;
+    ] ;
+    sh:property [
+        sh:path skos:inScheme ;
+        sh:hasValue mb:characters ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "Every concept is in the scheme mb:characters."@en ;
+    ] ;
+    # Every concept is either a top concept or has a broader concept, never both.
+    sh:xone (
+        [ sh:property [ sh:path skos:topConceptOf ; sh:hasValue mb:characters ; sh:minCount 1 ] ]
+        [ sh:property [ sh:path skos:broader ; sh:minCount 1 ] ]
+    ) ;
+    sh:property [
+        sh:path skos:broader ;
+        sh:class skos:Concept ;
+        sh:nodeKind sh:IRI ;
+        sh:message "skos:broader points at a concept (S19)."@en ;
+    ] ;
+    # S9 and S37: a concept is neither a scheme nor a collection.
+    sh:not [ sh:class skos:ConceptScheme ] ;
+    sh:not [ sh:class skos:Collection ] ;
+    # S27: skos:related (and its sub-properties) is disjoint with skos:broaderTransitive.
+    sh:sparql [
+        sh:message "S27: {$this} is related to {?other}, which is also above or below it in the hierarchy."@en ;
+        sh:prefixes mbsh: ;
+        sh:select """
+            SELECT $this ?other WHERE {
+                $this skos:related ?other .
+                { $this skos:broader+ ?other } UNION { ?other skos:broader+ $this }
+            }
+        """ ;
+    ] ;
+    # S46: exactMatch is disjoint with broadMatch and relatedMatch.
+    sh:property [ sh:path skos:exactMatch ; sh:disjoint skos:broadMatch ] ;
+    sh:property [ sh:path skos:exactMatch ; sh:disjoint skos:relatedMatch ] .
+
+mbsh:CollectionShape a sh:NodeShape ;
+    sh:targetClass skos:Collection ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype rdf:langString ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:languageIn ( "en" ) ;
+    ] ;
+    sh:property [ sh:path skos:definition ; sh:minCount 1 ; sh:datatype rdf:langString ] ;
+    sh:property [ sh:path skos:inScheme ; sh:hasValue mb:characters ] ;
+    sh:property [
+        sh:path skos:member ;
+        sh:minCount 2 ;
+        sh:class mbhx:Character ;
+        sh:message "A collection gathers at least two characters; groupings are not collection members."@en ;
+    ] ;
+    # S37: a collection is not a concept.
+    sh:not [ sh:class skos:Concept ] .
+
+mbsh:OrderedCollectionShape a sh:NodeShape ;
+    sh:targetClass skos:OrderedCollection ;
+    # S36: an ordered collection has exactly one member list, which is an RDF list.
+    sh:property [
+        sh:path skos:memberList ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:sparql [
+        sh:message "The member list of {$this} is not a well-formed RDF list at {?node}."@en ;
+        sh:prefixes mbsh: ;
+        sh:select """
+            SELECT $this ?node WHERE {
+                $this skos:memberList/rdf:rest* ?node .
+                FILTER(?node != rdf:nil)
+                FILTER( NOT EXISTS { ?node rdf:first ?f } || NOT EXISTS { ?node rdf:rest ?r } )
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "Member list and skos:member of {$this} disagree."@en ;
+        sh:prefixes mbsh: ;
+        sh:select """
+            SELECT $this ?m WHERE {
+                { $this skos:memberList/rdf:rest*/rdf:first ?m . FILTER NOT EXISTS { $this skos:member ?m } }
+                UNION
+                { $this skos:member ?m . FILTER NOT EXISTS { $this skos:memberList/rdf:rest*/rdf:first ?m } }
+            }
+        """ ;
+    ] .
+
+mbsh:SchemeShape a sh:NodeShape ;
+    sh:targetClass skos:ConceptScheme ;
+    sh:property [ sh:path skos:hasTopConcept ; sh:minCount 1 ; sh:class mbhx:Grouping ;
+                  sh:message "Top concepts are groupings."@en ] ;
+    sh:sparql [
+        sh:message "hasTopConcept and topConceptOf disagree for {?c}."@en ;
+        sh:prefixes mbsh: ;
+        sh:select """
+            SELECT $this ?c WHERE {
+                { $this skos:hasTopConcept ?c . FILTER NOT EXISTS { ?c skos:topConceptOf $this } }
+                UNION
+                { ?c skos:topConceptOf $this . FILTER NOT EXISTS { $this skos:hasTopConcept ?c } }
+            }
+        """ ;
+    ] .
+
+# ---------------------------------------------------------------------------
+# 2. Conventions of this scheme
+# ---------------------------------------------------------------------------
+
+mbsh:CharacterShape a sh:NodeShape ;
+    sh:targetClass mbhx:Character ;
+    sh:not [ sh:class mbhx:Grouping ] ;
+    sh:property [
+        sh:path skos:broader ;
+        sh:minCount 1 ;
+        sh:class mbhx:Grouping ;
+        sh:message "A character sits under at least one grouping and never under another character."@en ;
+    ] ;
+    sh:property [
+        sh:path skos:topConceptOf ;
+        sh:maxCount 0 ;
+        sh:message "A character is never a top concept."@en ;
+    ] ;
+    sh:property [
+        sh:path mbhx:fellOnWarDay ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1 ; sh:maxInclusive 18 ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path skos:exactMatch ;
+        sh:nodeKind sh:IRI ;
+        sh:pattern "^http://(www\\.wikidata\\.org/entity/Q[0-9]+|dbpedia\\.org/resource/.+)$" ;
+        sh:message "exactMatch targets are Wikidata items or DBpedia resources."@en ;
+    ] ;
+    sh:property [
+        sh:path skos:closeMatch ;
+        sh:nodeKind sh:IRI ;
+        sh:pattern "^http://(www\\.wikidata\\.org/entity/Q[0-9]+|dbpedia\\.org/resource/.+)$" ;
+    ] ;
+    sh:property [
+        sh:path foaf:isPrimaryTopicOf ;
+        sh:nodeKind sh:IRI ;
+        sh:pattern "^https://en\\.wikipedia\\.org/wiki/.+$" ;
+        sh:maxCount 1 ;
+    ] ;
+    # Every character has either a mapping or a seeAlso, so that each entry can be checked against a source.
+    sh:or (
+        [ sh:property [ sh:path skos:exactMatch ; sh:minCount 1 ] ]
+        [ sh:property [ sh:path skos:closeMatch ; sh:minCount 1 ] ]
+        [ sh:property [ sh:path rdfs:seeAlso ;   sh:minCount 1 ] ]
+    ) .
+
+mbsh:GroupingShape a sh:NodeShape ;
+    sh:targetClass mbhx:Grouping ;
+    sh:not [ sh:class mbhx:Character ] ;
+    sh:property [
+        sh:path skos:broader ;
+        sh:class mbhx:Grouping ;
+        sh:message "A grouping is only ever under another grouping."@en ;
+    ] ;
+    sh:property [
+        sh:path [ sh:inversePath skos:broader ] ;
+        sh:minCount 1 ;
+        sh:message "Every grouping has at least one narrower concept; an empty grouping is a leftover."@en ;
+    ] ;
+    sh:property [
+        sh:path mbhx:characterRelation ;
+        sh:maxCount 0 ;
+        sh:message "Character relations never attach to a grouping."@en ;
+    ] .
+
+# Character relations: both ends are characters (domain and range of mbhx:characterRelation).
+mbsh:CharacterRelationSubjectShape a sh:NodeShape ;
+    sh:targetSubjectsOf mbhx:characterRelation ;
+    sh:class mbhx:Character ;
+    sh:property [
+        sh:path mbhx:characterRelation ;
+        sh:class mbhx:Character ;
+        sh:nodeKind sh:IRI ;
+        sh:message "The object of a character relation is a character."@en ;
+    ] .
+
+# Each relation is stated once in the direction its property names; the
+# declared inverses are left to inference.
+mbsh:InverseNotMaterialisedShape a sh:NodeShape ;
+    sh:targetSubjectsOf mbhx:characterRelation ;
+    sh:property [ sh:path mbhx:parentOf ;      sh:maxCount 0 ; sh:message "State childOf on the child, not parentOf."@en ] ;
+    sh:property [ sh:path mbhx:fosterParentOf ; sh:maxCount 0 ; sh:message "State fosterChildOf on the child."@en ] ;
+    sh:property [ sh:path mbhx:teacherOf ;     sh:maxCount 0 ; sh:message "State studentOf on the student."@en ] ;
+    sh:property [ sh:path mbhx:killed ;        sh:maxCount 0 ; sh:message "State killedBy on the one killed."@en ] ;
+    sh:property [ sh:path mbhx:hasCharioteer ; sh:maxCount 0 ; sh:message "State charioteerOf on the charioteer."@en ] ;
+    sh:property [ sh:path mbhx:rebornAs ;      sh:maxCount 0 ; sh:message "State rebirthOf on the later birth."@en ] ;
+    sh:property [ sh:path mbhx:hasAvatar ;     sh:maxCount 0 ; sh:message "State avatarOf on the avatar."@en ] ;
+    sh:property [ sh:path mbhx:cursedBy ;      sh:maxCount 0 ; sh:message "State cursed on the one who curses."@en ] .
+
+# Symmetric relations are stated once per pair.
+mbsh:SymmetricOnceShape a sh:NodeShape ;
+    sh:targetSubjectsOf mbhx:spouseOf, mbhx:siblingOf, mbhx:friendOf, mbhx:rivalOf ;
+    sh:sparql [
+        sh:message "{$this} and {?o} state {?p} in both directions; state it once."@en ;
+        sh:prefixes mbsh: ;
+        sh:select """
+            SELECT $this ?p ?o WHERE {
+                $this ?p ?o . ?o ?p $this .
+                FILTER(?p IN (mbhx:spouseOf, mbhx:siblingOf, mbhx:friendOf, mbhx:rivalOf))
+            }
+        """ ;
+    ] .
+
+# Nobody is their own relative, and nobody is both parent and child of the same character.
+mbsh:NoSelfOrCycleShape a sh:NodeShape ;
+    sh:targetSubjectsOf mbhx:characterRelation ;
+    sh:sparql [
+        sh:message "{$this} is related to itself by {?p}."@en ;
+        sh:prefixes mbsh: ;
+        sh:select "SELECT $this ?p WHERE { $this ?p $this . ?p rdfs:subPropertyOf* mbhx:characterRelation . }" ;
+    ] ;
+    sh:sparql [
+        sh:message "{$this} and {?o} are each other's child."@en ;
+        sh:prefixes mbsh: ;
+        sh:select "SELECT $this ?o WHERE { $this mbhx:childOf ?o . ?o mbhx:childOf+ $this . }" ;
+    ] .
+
+# Namespace declarations for the SPARQL constraints above.
+mbsh: a owl:Ontology ;
+    sh:declare [ sh:prefix "skos" ; sh:namespace "http://www.w3.org/2004/02/skos/core#"^^xsd:anyURI ] ;
+    sh:declare [ sh:prefix "rdf"  ; sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI ] ;
+    sh:declare [ sh:prefix "rdfs" ; sh:namespace "http://www.w3.org/2000/01/rdf-schema#"^^xsd:anyURI ] ;
+    sh:declare [ sh:prefix "mbhx" ; sh:namespace "https://mahabharata.tanay.uk/schema#"^^xsd:anyURI ] .

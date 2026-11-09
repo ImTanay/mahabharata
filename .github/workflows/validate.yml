@@ -1,0 +1,32 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  shacl:
+    name: Syntax, SHACL, generated docs and website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install rdflib and pyshacl
+        run: pip install -r requirements.txt
+
+      - name: Validate the concept scheme
+        run: python scripts/validate.py
+
+      - name: Check that README.md and docs/ match the data
+        run: python scripts/render_docs.py --check
+
+      - name: Check that the website (index.html and the namespace documents) matches the data
+        run: python scripts/render_site.py --check
+
+      - name: Export other serialisations (smoke test)
+        run: python scripts/export.py --out dist

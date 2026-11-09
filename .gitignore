@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+
+# Generated outputs that are not part of the repository
+dist/
+validate.log
+*.zip
+
+# Editors and systems
+.DS_Store
+.idea/
+.vscode/

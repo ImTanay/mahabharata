@@ -1,0 +1,1863 @@
+# Characters of the Mahabharata: a SKOS concept scheme
+#
+# Format: RDF 1.1 Turtle. Vocabulary: SKOS (https://www.w3.org/TR/skos-reference/)
+# with a small extension schema (mbhx:) for kinship and narrative relations.
+# Source for the content: https://en.wikipedia.org/wiki/Mahabharata and the
+# character articles it links to.
+# Validate with: python scripts/validate.py (SHACL shapes in shapes.ttl).
+# Documentation in README.md and docs/ is generated from this file by
+# scripts/render_docs.py; the specification at https://mahabharata.tanay.uk/
+# (index.html) by scripts/render_site.py.
+#
+# Layout of this file
+#   1. Prefixes and the concept scheme
+#   2. Extension schema (classes and sub-properties of skos:related)
+#   3. Groupings: the hierarchy that places each character
+#   4. Characters, by grouping
+#   5. Collections: cross-cutting groups (war sides, birth order, narrative frame)
+
+@prefix mb:      <https://mahabharata.tanay.uk/> .
+@prefix mbh:     <https://mahabharata.tanay.uk/characters#> .
+@prefix mbhx:    <https://mahabharata.tanay.uk/schema#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix wd:      <http://www.wikidata.org/entity/> .
+@prefix dbr:     <http://dbpedia.org/resource/> .
+@prefix wp:      <https://en.wikipedia.org/wiki/> .
+
+# ---------------------------------------------------------------------------
+# 1. Concept scheme
+# ---------------------------------------------------------------------------
+
+mb:characters a skos:ConceptScheme ;
+    dcterms:title "Characters of the Mahabharata"@en ;
+    dcterms:description """A SKOS concept scheme of the characters of the Mahabharata, the Sanskrit epic of the dynastic war between the Pandavas and the Kauravas for the throne of Hastinapura. Each character is a skos:Concept placed under the lineage, royal house, order or class of being the epic gives it. Collections gather characters across that hierarchy: the two sides of the war, birth order, the survivors, the narrative frame. Kinship and narrative relations between characters use sub-properties of skos:related from the companion schema. Labels are given in English, in Sanskrit in Devanagari (sa-Deva) and in IAST transliteration (sa-Latn). Epithets and patronymics are alternative labels; common spellings are hidden labels. Every character with an English Wikipedia article is mapped to its Wikidata item and DBpedia resource."""@en ;
+    dcterms:created "2026-11-08"^^xsd:date ;
+    dcterms:modified "2026-11-09"^^xsd:date ;
+    owl:versionInfo "1.0.0" ;
+    dcterms:language "en", "sa" ;
+    dcterms:source <https://en.wikipedia.org/wiki/Mahabharata>,
+                   <https://en.wikipedia.org/wiki/List_of_characters_in_the_Mahabharata> ;
+    dcterms:conformsTo <https://www.w3.org/TR/skos-reference/> ;
+    dcterms:license <https://creativecommons.org/licenses/by-sa/4.0/> ;
+    rdfs:comment "The descriptions paraphrase the English Wikipedia article Mahabharata and the character articles it links to, which are published under CC BY-SA 4.0. Wikidata identifiers were resolved through the Wikipedia API on 2026-11-08."@en ;
+    skos:scopeNote """Modelling conventions. (1) Two kinds of concept: a mbhx:Character is a person, deity or other being; a mbhx:Grouping is a lineage, generation, royal house, order or class of being. skos:broader runs from a character to its groupings and from a grouping to a wider grouping; a character is never broader than another character. (2) A character that belongs to two groupings carries both (Draupadi is a Panchala by birth and a consort of the Pandavas by marriage; Krishna is a Yadava and the avatar of Vishnu). (3) Relations between characters are the mbhx: sub-properties of skos:related: childOf, fosterChildOf, spouseOf, siblingOf, studentOf, killedBy, charioteerOf, rebirthOf, avatarOf, friendOf, rivalOf, cursed. Each relation is stated once, in the direction the property names; the inverse is declared in the schema. siblingOf is stated only where the shared parent is not a concept in this scheme. (4) skos:Collection groups characters across the hierarchy; skos:OrderedCollection is used where the order carries meaning. (5) skos:exactMatch points to Wikidata and DBpedia; skos:closeMatch is used where the external resource is wider than the concept (a kingdom for a royal house, Yama for Dharma). foaf:isPrimaryTopicOf points to the English Wikipedia article."""@en ;
+    foaf:homepage <https://mahabharata.tanay.uk/> ;
+    skos:editorialNote "Every IRI of the scheme resolves to its entry in the specification at https://mahabharata.tanay.uk/: the fragment of a concept IRI (https://mahabharata.tanay.uk/characters#arjuna) or of a schema IRI (https://mahabharata.tanay.uk/schema#childOf) is the anchor of its description there. To publish under another namespace, edit the mb:, mbh: and mbhx: prefix declarations in this file and in shapes.ttl, and the namespace constants at the top of the scripts. The scheme covers the characters named in the Wikipedia synopsis and the principal figures of the Kurukshetra war. The epic names many hundreds more."@en ;
+    skos:hasTopConcept mbh:house-of-kuru, mbh:yadavas, mbh:panchala, mbh:other-royal-houses,
+                       mbh:brahmins-and-sages, mbh:sutas, mbh:deities, mbh:other-beings .
+
+# ---------------------------------------------------------------------------
+# 2. Extension schema
+# ---------------------------------------------------------------------------
+
+mb:schema a owl:Ontology ;
+    dcterms:title "Characters of the Mahabharata: SKOS extension schema"@en ;
+    owl:versionInfo "1.0.0" ;
+    rdfs:comment "Two subclasses of skos:Concept that separate characters from the groupings that organise them, one datatype property, and sub-properties of skos:related for kinship and narrative relations. SKOS allows such specialisation (SKOS Primer, section 4.7): a sub-property of skos:related inherits its meaning and stays within SKOS semantics. skos:related is symmetric, but that places no restriction on its sub-properties (SKOS Reference, section 8.6.3), so each sub-property here either has a declared inverse or is itself declared symmetric."@en ;
+    rdfs:seeAlso <https://www.w3.org/TR/skos-reference/#semantic-relations>, <https://www.w3.org/TR/skos-primer/#secskosspecialization> .
+
+mbhx:Character a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "Character"@en ;
+    skos:definition "A person, deity or other being that acts or is named in the Mahabharata."@en .
+
+mbhx:Grouping a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    owl:disjointWith mbhx:Character ;
+    rdfs:label "Grouping"@en ;
+    skos:definition "A lineage, generation, royal house, order or class of being under which characters are placed in the hierarchy."@en .
+
+mbhx:fellOnWarDay a owl:DatatypeProperty ;
+    rdfs:label "fell on war day"@en ;
+    rdfs:domain mbhx:Character ;
+    rdfs:range xsd:integer ;
+    skos:definition "The day of the eighteen-day Kurukshetra war on which the character was struck down. Bhishma falls on day 10 and dies after the war; the night raid after day 18 is counted as day 18."@en .
+
+mbhx:characterRelation a owl:ObjectProperty ;
+    rdfs:subPropertyOf skos:related ;
+    rdfs:label "character relation"@en ;
+    rdfs:domain mbhx:Character ;
+    rdfs:range mbhx:Character ;
+    skos:definition "Parent of every relation between two characters in this scheme. Not used directly."@en .
+
+mbhx:childOf a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:parentOf ;
+    rdfs:label "child of"@en ;
+    skos:definition "The subject is a child of the object, as the epic states parentage."@en ;
+    skos:scopeNote "Covers birth, fathering by a deity through Kunti's boon (the Pandavas, Karna) and fatherhood by niyoga (Dhritarashtra, Pandu and Vidura as sons of Vichitravirya; the Pandavas as sons of Pandu). The notes on the characters say which applies."@en .
+
+mbhx:parentOf a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:childOf ;
+    rdfs:label "parent of"@en .
+
+mbhx:fosterChildOf a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:fosterParentOf ;
+    rdfs:label "foster child of"@en ;
+    skos:definition "The subject was raised by the object without being born to them."@en .
+
+mbhx:fosterParentOf a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:fosterChildOf ;
+    rdfs:label "foster parent of"@en .
+
+mbhx:spouseOf a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    rdfs:label "spouse of"@en ;
+    skos:definition "The subject and the object are married."@en .
+
+mbhx:siblingOf a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    rdfs:label "sibling of"@en ;
+    skos:definition "The subject and the object share a parent."@en ;
+    skos:scopeNote "Stated only where the shared parent is not a concept in this scheme; otherwise the relation follows from childOf."@en .
+
+mbhx:studentOf a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:teacherOf ;
+    rdfs:label "student of"@en ;
+    skos:definition "The object taught the subject, in arms or in learning."@en .
+
+mbhx:teacherOf a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:studentOf ;
+    rdfs:label "teacher of"@en .
+
+mbhx:killedBy a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:killed ;
+    rdfs:label "killed by"@en ;
+    skos:definition "The object struck the blow that killed the subject, or in Bhishma's case the blow that brought him down."@en .
+
+mbhx:killed a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:killedBy ;
+    rdfs:label "killed"@en .
+
+mbhx:charioteerOf a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:hasCharioteer ;
+    rdfs:label "charioteer of"@en ;
+    skos:definition "The subject drove the object's chariot."@en .
+
+mbhx:hasCharioteer a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:charioteerOf ;
+    rdfs:label "has charioteer"@en .
+
+mbhx:rebirthOf a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:rebornAs ;
+    rdfs:label "rebirth of"@en ;
+    skos:definition "The subject is the object born again in a later life."@en .
+
+mbhx:rebornAs a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:rebirthOf ;
+    rdfs:label "reborn as"@en .
+
+mbhx:avatarOf a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:hasAvatar ;
+    rdfs:label "avatar of"@en ;
+    skos:definition "The subject is an incarnation of the deity named by the object."@en .
+
+mbhx:hasAvatar a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:avatarOf ;
+    rdfs:label "has avatar"@en .
+
+mbhx:friendOf a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    rdfs:label "friend of"@en ;
+    skos:definition "A friendship the epic treats as a defining bond."@en .
+
+mbhx:rivalOf a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    rdfs:label "rival of"@en ;
+    skos:definition "A personal enmity the epic treats as a defining bond."@en .
+
+mbhx:cursed a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:cursedBy ;
+    rdfs:label "cursed"@en ;
+    skos:definition "The subject pronounced a curse on the object that takes effect in the story."@en .
+
+mbhx:cursedBy a owl:ObjectProperty ;
+    rdfs:subPropertyOf mbhx:characterRelation ;
+    owl:inverseOf mbhx:cursed ;
+    rdfs:label "cursed by"@en .
+
+# ---------------------------------------------------------------------------
+# 3. Groupings
+# ---------------------------------------------------------------------------
+
+mbh:house-of-kuru a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:topConceptOf mb:characters ;
+    skos:prefLabel "House of Kuru"@en, "कुरुवंश"@sa-Deva, "Kuruvaṁśa"@sa-Latn ;
+    skos:altLabel "Kuru dynasty"@en, "Kurus"@en ;
+    skos:definition "The royal lineage of Hastinapura descended from King Kuru, to which both the Pandavas and the Kauravas belong."@en ;
+    skos:scopeNote "Arranged by generation, from Shantanu to Janamejaya. Women who marry into the house are placed in the generation of their husbands. The word Kaurava in its narrow sense means the sons of Dhritarashtra; see the Kauravas grouping."@en ;
+    skos:closeMatch wd:Q1068408, dbr:Kuru_kingdom ;
+    rdfs:seeAlso wp:Kuru_kingdom .
+
+mbh:kuru-generation-shantanu a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:house-of-kuru ;
+    skos:prefLabel "House of Kuru: generation of Shantanu"@en ;
+    skos:definition "Shantanu, his brother Bahlika, his queen Satyavati, his sons Bhishma, Chitrangada and Vichitravirya, and Vichitravirya's wives Ambika and Ambalika."@en ;
+    skos:scopeNote "Shantanu's first wife Ganga is placed under Deities and linked to him by spouseOf."@en .
+
+mbh:kuru-generation-pandu a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:house-of-kuru ;
+    skos:prefLabel "House of Kuru: generation of Pandu"@en ;
+    skos:definition "The sons born to Vichitravirya's widows by Vyasa, and their wives: Dhritarashtra and Gandhari, Pandu with Kunti and Madri, and Vidura."@en ;
+    skos:scopeNote "Gandhari, Kunti and Madri are also placed under the houses of their birth."@en .
+
+mbh:pandavas a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:house-of-kuru ;
+    skos:prefLabel "Pandavas"@en, "पाण्डव"@sa-Deva, "Pāṇḍava"@sa-Latn ;
+    skos:altLabel "Sons of Pandu"@en, "Pandava brothers"@en ;
+    skos:definition "The five sons of Pandu, born to Kunti and Madri through the gods Kunti invoked, and the protagonists of the epic."@en ;
+    skos:scopeNote "Only the five brothers. Their wives are under Consorts of the Pandavas and their sons under Children of the Pandavas."@en ;
+    skos:related mbh:kauravas ;
+    skos:exactMatch wd:Q236221, dbr:Pandava ;
+    foaf:isPrimaryTopicOf wp:Pandava .
+
+mbh:kauravas a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:house-of-kuru ;
+    skos:prefLabel "Kauravas"@en, "कौरव"@sa-Deva, "Kaurava"@sa-Latn ;
+    skos:altLabel "Sons of Dhritarashtra"@en, "Dhartarashtras"@en ;
+    skos:definition "The hundred sons of Dhritarashtra and Gandhari, led by Duryodhana, together with their sister Dussala and their half-brother Yuyutsu."@en ;
+    skos:scopeNote "Used in the narrow sense of the children of Dhritarashtra. In the broad sense Kaurava means any descendant of Kuru, which includes the Pandavas. Only the children with a part of their own in the story are listed."@en ;
+    skos:exactMatch wd:Q1648561, dbr:Kaurava ;
+    foaf:isPrimaryTopicOf wp:Kaurava .
+
+mbh:consorts-of-the-pandavas a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:house-of-kuru ;
+    skos:prefLabel "Consorts of the Pandavas"@en ;
+    skos:definition "Women married to one or more of the five Pandavas: Draupadi, the wife of all five, and the wives of Bhima and Arjuna whose sons fight in the war."@en ;
+    skos:scopeNote "Draupadi, Hidimbi, Ulupi, Chitrangada of Manipura and Subhadra. Wives who take no part in the story are not listed. Each consort is also placed under her house or people of birth."@en .
+
+mbh:children-of-the-pandavas a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:house-of-kuru ;
+    skos:prefLabel "Children of the Pandavas"@en ;
+    skos:definition "The sons of the five Pandavas who act in the epic: the five sons of Draupadi, and the sons of Arjuna and Bhima by their other wives."@en .
+
+mbh:upapandavas a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:children-of-the-pandavas ;
+    skos:prefLabel "Upapandavas"@en, "उपपाण्डव"@sa-Deva, "Upapāṇḍava"@sa-Latn ;
+    skos:altLabel "Draupadeyas"@en, "Sons of Draupadi"@en, "द्रौपदेय"@sa-Deva, "Draupadeya"@sa-Latn ;
+    skos:definition "The five sons of Draupadi, one by each Pandava, all killed in their sleep by Ashwatthama on the night after the last day of the war."@en ;
+    skos:exactMatch wd:Q7898172, dbr:Draupadeyas ;
+    foaf:isPrimaryTopicOf wp:Draupadeyas .
+
+mbh:children-of-the-kauravas a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:house-of-kuru ;
+    skos:prefLabel "Children of the Kauravas"@en ;
+    skos:definition "Sons of Dhritarashtra's sons who act in the epic: Lakshmana Kumara, Duryodhana's son, and Durmasena, Dushasana's son, both of whom fall in the fight around Abhimanyu."@en .
+
+mbh:later-kuru-kings a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:house-of-kuru ;
+    skos:prefLabel "House of Kuru: kings after the war"@en ;
+    skos:definition "The Kuru kings of Hastinapura after Yudhishthira: Parikshit and his son Janamejaya, at whose snake sacrifice the epic is recited."@en .
+
+mbh:yadavas a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:topConceptOf mb:characters ;
+    skos:prefLabel "Yadavas"@en, "यादव"@sa-Deva, "Yādava"@sa-Latn ;
+    skos:altLabel "Vrishnis"@en, "Yadus"@en ;
+    skos:definition "The clan of Krishna, descended from Yadu, including the Vrishni, Andhaka and Bhoja branches, with their capital at Dwaraka."@en ;
+    skos:scopeNote "Kunti belongs here by birth as the daughter of the Yadava Shurasena, and Kuntibhoja as Shurasena's cousin."@en ;
+    skos:exactMatch wd:Q8046532, dbr:Yadava ;
+    foaf:isPrimaryTopicOf wp:Yadava .
+
+mbh:panchala a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:topConceptOf mb:characters ;
+    skos:prefLabel "Royal house of Panchala"@en, "पाञ्चाल"@sa-Deva, "Pāñcāla"@sa-Latn ;
+    skos:altLabel "Panchalas"@en ;
+    skos:definition "The royal family of the Panchala kingdom under Drupada, allied by marriage to the Pandavas through Draupadi."@en ;
+    skos:closeMatch wd:Q558603, dbr:Panchala ;
+    rdfs:seeAlso wp:Panchala .
+
+mbh:other-royal-houses a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:topConceptOf mb:characters ;
+    skos:prefLabel "Other royal houses"@en ;
+    skos:definition "Royal families of kingdoms other than Kuru, Yadava and Panchala whose members act in the epic, grouped by kingdom."@en ;
+    skos:scopeNote "A kingdom appears here only if one of its royal family is a character in the scheme."@en .
+
+mbh:kingdom-matsya a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Matsya"@en, "मत्स्य"@sa-Deva, "Matsya"@sa-Latn ;
+    skos:definition "The family of King Virata, at whose court the Pandavas spend the thirteenth year of their exile in disguise."@en ;
+    skos:closeMatch wd:Q113100727 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/Matsya_(kingdom)> .
+
+mbh:kingdom-madra a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Madra"@en, "मद्र"@sa-Deva, "Madra"@sa-Latn ;
+    skos:definition "The family of Shalya: his sister Madri marries Pandu, and Shalya fights for the Kauravas."@en ;
+    skos:closeMatch wd:Q6728459, dbr:Madra_kingdom ;
+    rdfs:seeAlso wp:Madra_kingdom .
+
+mbh:kingdom-gandhara a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Gandhara"@en, "गान्धार"@sa-Deva, "Gāndhāra"@sa-Latn ;
+    skos:definition "The children of King Subala: Gandhari, who marries Dhritarashtra, and Shakuni, who engineers the dice game, with Shakuni's son Uluka."@en ;
+    skos:closeMatch wd:Q112980583 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/Gandhāra_Kingdom> .
+
+mbh:kingdom-anga a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Anga"@en, "अङ्ग"@sa-Deva, "Aṅga"@sa-Latn ;
+    skos:definition "Karna, whom Duryodhana crowns king of Anga, and his son Vrishasena."@en ;
+    skos:closeMatch wd:Q1155818, dbr:Anga ;
+    rdfs:seeAlso wp:Anga .
+
+mbh:kingdom-kashi a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Kashi"@en, "काशी"@sa-Deva, "Kāśī"@sa-Latn ;
+    skos:definition "The three princesses of Kashi whom Bhishma carries off from their swayamvara: Amba, Ambika and Ambalika."@en ;
+    skos:closeMatch wd:Q12660335 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/Kāśī_(kingdom)> .
+
+mbh:kingdom-sindhu a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Sindhu"@en, "सिन्धु"@sa-Deva, "Sindhu"@sa-Latn ;
+    skos:definition "Jayadratha, king of Sindhu and husband of Dussala."@en ;
+    skos:closeMatch wd:Q7522239, dbr:Sindhu_Kingdom ;
+    rdfs:seeAlso wp:Sindhu_Kingdom .
+
+mbh:kingdom-magadha a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Magadha"@en, "मगध"@sa-Deva, "Magadha"@sa-Latn ;
+    skos:definition "Jarasandha, the king of Magadha whom Bhima kills before Yudhishthira's royal consecration."@en ;
+    skos:closeMatch wd:Q234009, dbr:Magadha ;
+    rdfs:seeAlso wp:Magadha .
+
+mbh:kingdom-chedi a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Chedi"@en, "चेदि"@sa-Deva, "Cedi"@sa-Latn ;
+    skos:definition "Shishupala, whom Krishna kills at the royal consecration, and his son Dhrishtaketu, who fights for the Pandavas."@en ;
+    skos:closeMatch wd:Q1329944, dbr:Chedi_kingdom ;
+    rdfs:seeAlso wp:Chedi_kingdom .
+
+mbh:kingdom-pragjyotisha a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Pragjyotisha"@en, "प्राग्ज्योतिष"@sa-Deva, "Prāgjyotiṣa"@sa-Latn ;
+    skos:definition "Bhagadatta, the elephant-riding king of Pragjyotisha who fights for the Kauravas."@en ;
+    skos:closeMatch wd:Q1194765 ;
+    rdfs:seeAlso wp:Kamarupa .
+
+mbh:kingdom-trigarta a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Trigarta"@en, "त्रिगर्त"@sa-Deva, "Trigarta"@sa-Latn ;
+    skos:definition "Susharma, king of Trigarta and leader of the Samsaptakas, who fights for the Kauravas."@en ;
+    skos:closeMatch wd:Q7841669, dbr:Trigarta ;
+    rdfs:seeAlso wp:Trigarta .
+
+mbh:kingdom-kamboja a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Kamboja"@en, "कम्बोज"@sa-Deva, "Kamboja"@sa-Latn ;
+    skos:definition "Sudakshina, king of the Kambojas, who fights for the Kauravas."@en ;
+    skos:closeMatch wd:Q6356381, dbr:Kamboja ;
+    rdfs:seeAlso wp:Kamboja .
+
+mbh:kingdom-bahlika a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Bahlika"@en, "बाह्लीक"@sa-Deva, "Bāhlīka"@sa-Latn ;
+    skos:definition "The Kuru branch that rules Bahlika: Shantanu's brother Bahlika, his son Somadatta and his grandson Bhurishravas, all of whom fight for the Kauravas."@en ;
+    skos:closeMatch wd:Q4272177, dbr:Bahlikas ;
+    rdfs:seeAlso wp:Bahlikas .
+
+mbh:kingdom-nishada a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of the Nishadas"@en, "निषाद"@sa-Deva, "Niṣāda"@sa-Latn ;
+    skos:definition "Ekalavya, the Nishada prince who teaches himself archery."@en ;
+    skos:closeMatch wd:Q7040266, dbr:Nishadas ;
+    rdfs:seeAlso wp:Nishadas .
+
+mbh:kingdom-vidarbha a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Vidarbha"@en, "विदर्भ"@sa-Deva, "Vidarbha"@sa-Latn ;
+    skos:definition "Rukmi, king of Vidarbha and brother of Krishna's wife Rukmini."@en ;
+    skos:closeMatch wd:Q7927728, dbr:Vidarbha_kingdom ;
+    rdfs:seeAlso wp:Vidarbha_kingdom .
+
+mbh:kingdom-manipura a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-royal-houses ;
+    skos:prefLabel "Royal house of Manipura"@en, "मणिपुर"@sa-Deva, "Maṇipura"@sa-Latn ;
+    skos:definition "Chitrangada, who marries Arjuna, and their son Babruvahana, who rules Manipura after his grandfather."@en ;
+    skos:closeMatch wd:Q106452195 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/Manipura_(Mahabharata)> .
+
+mbh:brahmins-and-sages a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:topConceptOf mb:characters ;
+    skos:prefLabel "Brahmins and sages"@en ;
+    skos:definition "Brahmin characters: the sages who compose, narrate and intervene in the story, and the Brahmin warriors who teach arms to the Kuru princes."@en .
+
+mbh:sages a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:brahmins-and-sages ;
+    skos:prefLabel "Sages"@en, "ऋषि"@sa-Deva, "Ṛṣi"@sa-Latn ;
+    skos:altLabel "Rishis"@en ;
+    skos:definition "Seers and ascetics who compose, narrate and shape the story through boons and curses."@en ;
+    skos:closeMatch wd:Q755990, dbr:Rishi ;
+    rdfs:seeAlso wp:Rishi .
+
+mbh:warrior-brahmins a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:brahmins-and-sages ;
+    skos:prefLabel "Brahmin warriors of the Kuru court"@en ;
+    skos:definition "Drona's family and Kripa: Brahmins by birth who teach arms to the Kuru princes and fight for the Kauravas."@en .
+
+mbh:sutas a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:topConceptOf mb:characters ;
+    skos:prefLabel "Sutas"@en, "सूत"@sa-Deva, "Sūta"@sa-Latn ;
+    skos:altLabel "Charioteers and bards"@en ;
+    skos:definition "Members of the suta class of charioteers and bards: the epic's reciter Ugrashravas, Dhritarashtra's narrator Sanjaya, and Karna's foster family."@en ;
+    skos:scopeNote "Karna is placed here as the son of a suta household and under Anga as its king."@en ;
+    skos:closeMatch wd:Q7649873, dbr:Suta ;
+    rdfs:seeAlso wp:Suta .
+
+mbh:deities a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:topConceptOf mb:characters ;
+    skos:prefLabel "Deities and celestial beings"@en, "देव"@sa-Deva, "Deva"@sa-Latn ;
+    skos:altLabel "Gods"@en ;
+    skos:definition "Gods, goddesses and celestial beings who father, marry, test, arm or curse the human characters."@en ;
+    skos:scopeNote "Krishna is placed here as the avatar of Vishnu and under the Yadavas by birth. Hanuman and the nymph Urvashi are included as celestial beings."@en ;
+    skos:closeMatch wd:Q211258 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/Deva_(Hinduism)> .
+
+mbh:other-beings a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:topConceptOf mb:characters ;
+    skos:prefLabel "Rakshasas, Nagas and Asuras"@en ;
+    skos:definition "Non-human peoples of the epic other than the gods: the rakshasas the Pandavas fight and marry, the serpent Nagas, and the asura architect Maya."@en .
+
+mbh:rakshasas a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-beings ;
+    skos:prefLabel "Rakshasas"@en, "राक्षस"@sa-Deva, "Rākṣasa"@sa-Latn ;
+    skos:definition "Man-eating forest beings, several of whom Bhima kills, and the family into which he marries."@en ;
+    skos:closeMatch wd:Q1049467, dbr:Rakshasa ;
+    rdfs:seeAlso wp:Rakshasa .
+
+mbh:nagas a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-beings ;
+    skos:prefLabel "Nagas"@en, "नाग"@sa-Deva, "Nāga"@sa-Latn ;
+    skos:definition "Serpent beings: Arjuna's wife Ulupi and the serpent king Takshaka, whose bite kills Parikshit."@en ;
+    skos:closeMatch wd:Q271990, dbr:Nāga ;
+    rdfs:seeAlso wp:Nāga .
+
+mbh:asuras a mbhx:Grouping, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:other-beings ;
+    skos:prefLabel "Asuras and Danavas"@en, "असुर"@sa-Deva, "Asura"@sa-Latn ;
+    skos:definition "Demons; in this scheme the Danava architect Maya."@en ;
+    skos:closeMatch wd:Q624083, dbr:Asura ;
+    rdfs:seeAlso wp:Asura .
+
+# ---------------------------------------------------------------------------
+# 4. Characters
+# ---------------------------------------------------------------------------
+
+# 4.1 House of Kuru: generation of Shantanu
+
+mbh:shantanu a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-shantanu ;
+    skos:prefLabel "Shantanu"@en, "शान्तनु"@sa-Deva, "Śāntanu"@sa-Latn ;
+    skos:hiddenLabel "Santanu"@en, "Shantanu of Hastinapura"@en ;
+    skos:definition "King of Hastinapura, husband of the goddess Ganga and then of the fisherwoman Satyavati, and father of Bhishma, Chitrangada and Vichitravirya."@en ;
+    skos:note "Satyavati's father agreed to the marriage only on the promise that her son would inherit the throne. Devavrata, later Bhishma, gave up his claim and vowed lifelong celibacy to secure it."@en ;
+    mbhx:spouseOf mbh:ganga, mbh:satyavati ;
+    mbhx:siblingOf mbh:bahlika ;
+    skos:exactMatch wd:Q1973947, dbr:Shantanu ;
+    foaf:isPrimaryTopicOf wp:Shantanu .
+
+mbh:bahlika a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-shantanu, mbh:kingdom-bahlika ;
+    skos:prefLabel "Bahlika"@en, "बाह्लीक"@sa-Deva, "Bāhlīka"@sa-Latn ;
+    skos:hiddenLabel "Vahlika"@en, "Balhika"@en ;
+    skos:definition "Elder brother of Shantanu who left Hastinapura to rule the Bahlika kingdom; the oldest warrior on the field at Kurukshetra, where he fights for the Kauravas and is killed by Bhima."@en ;
+    mbhx:killedBy mbh:bhima ;
+    mbhx:fellOnWarDay 14 ;
+    skos:exactMatch wd:Q12452536, <http://dbpedia.org/resource/Bahlika_(king)> ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Bahlika_(king)> .
+
+mbh:satyavati a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-shantanu ;
+    skos:prefLabel "Satyavati"@en, "सत्यवती"@sa-Deva, "Satyavatī"@sa-Latn ;
+    skos:altLabel "Matsyagandha"@en, "Yojanagandha"@en, "Daseyi"@en, "मत्स्यगन्धा"@sa-Deva, "Matsyagandhā"@sa-Latn ;
+    skos:hiddenLabel "Satyawati"@en ;
+    skos:definition "Daughter of the chief of the fishermen, mother of Vyasa by the sage Parashara before her marriage, queen of Shantanu, and mother of Chitrangada and Vichitravirya."@en ;
+    skos:note "When Vichitravirya died childless she called on Vyasa to father children with his widows, which produced Dhritarashtra, Pandu and Vidura."@en ;
+    skos:exactMatch wd:Q2044655, dbr:Satyavati ;
+    foaf:isPrimaryTopicOf wp:Satyavati .
+
+mbh:bhishma a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-shantanu ;
+    skos:prefLabel "Bhishma"@en, "भीष्म"@sa-Deva, "Bhīṣma"@sa-Latn ;
+    skos:altLabel "Devavrata"@en, "Gangaputra"@en, "Gangeya"@en, "Shantanava"@en, "Pitamaha"@en, "देवव्रत"@sa-Deva, "Devavrata"@sa-Latn, "Gāṅgeya"@sa-Latn ;
+    skos:hiddenLabel "Bhishm"@en, "Bheeshma"@en ;
+    skos:definition "Son of Shantanu and Ganga, born Devavrata; the Kuru patriarch who renounced the throne and vowed celibacy so that Satyavati's son could inherit, and who commands the Kaurava army for the first ten days of the war."@en ;
+    skos:note "He carried off the three princesses of Kashi for Vichitravirya, which made Amba his lifelong enemy. He held a boon to choose the hour of his death. Felled by Arjuna's arrows on day 10 while refusing to fight Shikhandi, he lay on a bed of arrows until the sun's northward turn, instructing Yudhishthira in the duties of a king before he died."@en ;
+    mbhx:childOf mbh:shantanu, mbh:ganga ;
+    mbhx:studentOf mbh:parashurama ;
+    mbhx:killedBy mbh:arjuna ;
+    mbhx:fellOnWarDay 10 ;
+    skos:exactMatch wd:Q1405629, dbr:Bhishma ;
+    foaf:isPrimaryTopicOf wp:Bhishma .
+
+mbh:chitrangada-kuru a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-shantanu ;
+    skos:prefLabel "Chitrangada (son of Shantanu)"@en, "चित्राङ्गद"@sa-Deva, "Citrāṅgada"@sa-Latn ;
+    skos:hiddenLabel "Chitrangad"@en ;
+    skos:definition "Elder son of Shantanu and Satyavati, who succeeded his father and was killed in a long duel by a gandharva of the same name."@en ;
+    skos:scopeNote "Not the princess of Manipura who marries Arjuna; see Chitrangada (princess of Manipura)."@en ;
+    mbhx:childOf mbh:shantanu, mbh:satyavati ;
+    skos:exactMatch wd:Q1994800, <http://dbpedia.org/resource/Chitrangada_(king)> ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Chitrangada_(king)> .
+
+mbh:vichitravirya a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-shantanu ;
+    skos:prefLabel "Vichitravirya"@en, "विचित्रवीर्य"@sa-Deva, "Vicitravīrya"@sa-Latn ;
+    skos:hiddenLabel "Vichitraveerya"@en ;
+    skos:definition "Younger son of Shantanu and Satyavati, king of Hastinapura after Chitrangada, married to Ambika and Ambalika, who died childless."@en ;
+    skos:note "By the custom of niyoga, the sons Vyasa fathered with his widows, Dhritarashtra and Pandu, and with their maid, Vidura, count as his."@en ;
+    mbhx:childOf mbh:shantanu, mbh:satyavati ;
+    mbhx:spouseOf mbh:ambika, mbh:ambalika ;
+    skos:exactMatch wd:Q1987279, dbr:Vichitravirya ;
+    foaf:isPrimaryTopicOf wp:Vichitravirya .
+
+mbh:ambika a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-shantanu, mbh:kingdom-kashi ;
+    skos:prefLabel "Ambika"@en, "अम्बिका"@sa-Deva, "Ambikā"@sa-Latn ;
+    skos:definition "Princess of Kashi and wife of Vichitravirya; she shut her eyes before Vyasa during the niyoga, and her son Dhritarashtra was born blind."@en ;
+    mbhx:siblingOf mbh:amba, mbh:ambalika ;
+    skos:exactMatch wd:Q2044636, <http://dbpedia.org/resource/Ambika_(Mahabharata)> ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Ambika_(Mahabharata)> .
+
+mbh:ambalika a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-shantanu, mbh:kingdom-kashi ;
+    skos:prefLabel "Ambalika"@en, "अम्बालिका"@sa-Deva, "Ambālikā"@sa-Latn ;
+    skos:definition "Princess of Kashi and wife of Vichitravirya; she turned pale before Vyasa during the niyoga, and her son Pandu was born pale."@en ;
+    mbhx:siblingOf mbh:amba ;
+    skos:exactMatch wd:Q1994807, dbr:Ambalika ;
+    foaf:isPrimaryTopicOf wp:Ambalika .
+
+# 4.2 House of Kuru: generation of Pandu
+
+mbh:dhritarashtra a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-pandu ;
+    skos:prefLabel "Dhritarashtra"@en, "धृतराष्ट्र"@sa-Deva, "Dhṛtarāṣṭra"@sa-Latn ;
+    skos:hiddenLabel "Dhritrashtra"@en, "Dhritarastra"@en ;
+    skos:definition "Blind king of Hastinapura, son of Vyasa and Ambika, husband of Gandhari and father of the hundred Kauravas; the war is narrated to him by Sanjaya."@en ;
+    skos:note "Passed over for the throne because of his blindness, he ruled after Pandu's death. He could not restrain Duryodhana. After the war he retired to the forest with Gandhari and Kunti, where all three died in a forest fire."@en ;
+    mbhx:childOf mbh:vyasa, mbh:ambika, mbh:vichitravirya ;
+    mbhx:spouseOf mbh:gandhari ;
+    skos:exactMatch wd:Q926150, dbr:Dhritarashtra ;
+    foaf:isPrimaryTopicOf wp:Dhritarashtra .
+
+mbh:gandhari a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-pandu, mbh:kingdom-gandhara ;
+    skos:prefLabel "Gandhari"@en, "गान्धारी"@sa-Deva, "Gāndhārī"@sa-Latn ;
+    skos:altLabel "Saubaleyi"@en ;
+    skos:hiddenLabel "Gandhaari"@en ;
+    skos:definition "Princess of Gandhara, sister of Shakuni and wife of Dhritarashtra, who blindfolded herself for life to share her husband's blindness; mother of the hundred Kauravas and of Dussala."@en ;
+    skos:note "After the war she cursed Krishna: his own clan would destroy itself as hers had. The curse was fulfilled thirty-six years later."@en ;
+    mbhx:siblingOf mbh:shakuni ;
+    mbhx:cursed mbh:krishna ;
+    skos:exactMatch wd:Q1849082, dbr:Gandhari ;
+    foaf:isPrimaryTopicOf wp:Gandhari .
+
+mbh:pandu a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-pandu ;
+    skos:prefLabel "Pandu"@en, "पाण्डु"@sa-Deva, "Pāṇḍu"@sa-Latn ;
+    skos:hiddenLabel "Pandu of Hastinapura"@en ;
+    skos:definition "Son of Vyasa and Ambalika, king of Hastinapura before Dhritarashtra, husband of Kunti and Madri, and father of the five Pandavas."@en ;
+    skos:note "Cursed by the sage Kindama, whom he shot while the sage was in the form of a deer, to die if he ever lay with a woman, he withdrew to the forest. His sons were born through the gods Kunti invoked and count as his by niyoga. He died embracing Madri."@en ;
+    mbhx:childOf mbh:vyasa, mbh:ambalika, mbh:vichitravirya ;
+    mbhx:spouseOf mbh:kunti, mbh:madri ;
+    skos:exactMatch wd:Q857071, dbr:Pandu ;
+    foaf:isPrimaryTopicOf wp:Pandu .
+
+mbh:kunti a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-pandu, mbh:yadavas ;
+    skos:prefLabel "Kunti"@en, "कुन्ती"@sa-Deva, "Kuntī"@sa-Latn ;
+    skos:altLabel "Pritha"@en, "पृथा"@sa-Deva, "Pṛthā"@sa-Latn ;
+    skos:hiddenLabel "Kunthi"@en ;
+    skos:definition "Daughter of the Yadava Shurasena, raised by Kuntibhoja; first wife of Pandu and mother of Karna by Surya before her marriage, and of Yudhishthira, Bhima and Arjuna by the gods Dharma, Vayu and Indra."@en ;
+    skos:note "The sage Durvasa gave her a mantra to summon any god for a son. She shared it with Madri. She raised the five brothers after Pandu's death and died in the forest fire with Dhritarashtra and Gandhari."@en ;
+    mbhx:fosterChildOf mbh:kuntibhoja ;
+    mbhx:siblingOf mbh:vasudeva ;
+    mbhx:studentOf mbh:durvasa ;
+    skos:exactMatch wd:Q844424, dbr:Kunti ;
+    foaf:isPrimaryTopicOf wp:Kunti .
+
+mbh:madri a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-pandu, mbh:kingdom-madra ;
+    skos:prefLabel "Madri"@en, "माद्री"@sa-Deva, "Mādrī"@sa-Latn ;
+    skos:hiddenLabel "Maadri"@en ;
+    skos:definition "Princess of Madra, sister of Shalya and second wife of Pandu; mother of the twins Nakula and Sahadeva by the Ashvins."@en ;
+    skos:note "Pandu died in her arms, breaking Kindama's curse; she followed him onto the pyre and left the twins to Kunti."@en ;
+    mbhx:siblingOf mbh:shalya ;
+    skos:exactMatch wd:Q1770690, dbr:Madri ;
+    foaf:isPrimaryTopicOf wp:Madri .
+
+mbh:vidura a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kuru-generation-pandu ;
+    skos:prefLabel "Vidura"@en, "विदुर"@sa-Deva, "Vidura"@sa-Latn ;
+    skos:altLabel "Kshatta"@en ;
+    skos:hiddenLabel "Vidur"@en ;
+    skos:definition "Son of Vyasa and a maid of the Kashi princesses, half-brother of Dhritarashtra and Pandu, and chief minister of Hastinapura, held to be the wisest man of the epic and an incarnation of the god Dharma."@en ;
+    skos:note "He warned the Pandavas of the house of lac and sent the miner who dug their escape tunnel. He protested the dice game and the treatment of Draupadi. He did not fight in the war."@en ;
+    mbhx:childOf mbh:vyasa, mbh:vichitravirya ;
+    mbhx:avatarOf mbh:dharma ;
+    skos:exactMatch wd:Q2002511, dbr:Vidura ;
+    foaf:isPrimaryTopicOf wp:Vidura .
+
+# 4.3 Pandavas
+
+mbh:yudhishthira a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:pandavas ;
+    skos:prefLabel "Yudhishthira"@en, "युधिष्ठिर"@sa-Deva, "Yudhiṣṭhira"@sa-Latn ;
+    skos:altLabel "Dharmaraja"@en, "Ajatashatru"@en, "Dharmaputra"@en, "Kanka"@en, "धर्मराज"@sa-Deva, "Dharmarāja"@sa-Latn, "Ajātaśatru"@sa-Latn ;
+    skos:hiddenLabel "Yudhisthira"@en, "Yudhishthir"@en, "Yudhisthir"@en, "Dharmaraj"@en ;
+    skos:definition "Eldest Pandava, son of Kunti and the god Dharma, known for his truthfulness; he loses the kingdom at dice, leads his brothers through exile and war, and rules Hastinapura after the victory."@en ;
+    skos:note "His royal consecration provoked Duryodhana's envy. He answered the questions of the Yaksha at the lake during the exile. At Virata's court he served as the courtier Kanka. He killed Shalya on day 18. On the final journey he alone reached heaven in the body, with a dog who was Dharma in disguise."@en ;
+    mbhx:childOf mbh:kunti, mbh:pandu, mbh:dharma ;
+    mbhx:studentOf mbh:drona, mbh:bhishma ;
+    skos:exactMatch wd:Q983067, dbr:Yudhishthira ;
+    foaf:isPrimaryTopicOf wp:Yudhishthira .
+
+mbh:bhima a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:pandavas ;
+    skos:prefLabel "Bhima"@en, "भीम"@sa-Deva, "Bhīma"@sa-Latn ;
+    skos:altLabel "Bhimasena"@en, "Vrikodara"@en, "Vallabha"@en, "भीमसेन"@sa-Deva, "Bhīmasena"@sa-Latn, "Vṛkodara"@sa-Latn ;
+    skos:hiddenLabel "Bheem"@en, "Bhim"@en, "Bheema"@en ;
+    skos:definition "Second Pandava, son of Kunti and the wind god Vayu, the strongest of the brothers and a mace fighter; he kills Hidimba, Bakasura, Kirmira, Jarasandha, Kichaka and, in the war, Dushasana and Duryodhana."@en ;
+    skos:note "He vowed to drink Dushasana's blood and to break Duryodhana's thigh for the humiliation of Draupadi, and did both. At Virata's court he served as the cook Vallabha. Hanuman, also a son of Vayu, is his brother."@en ;
+    mbhx:childOf mbh:kunti, mbh:pandu, mbh:vayu ;
+    mbhx:studentOf mbh:drona, mbh:balarama ;
+    mbhx:rivalOf mbh:duryodhana ;
+    skos:exactMatch wd:Q3651886, dbr:Bhima ;
+    foaf:isPrimaryTopicOf wp:Bhima .
+
+mbh:arjuna a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:pandavas ;
+    skos:prefLabel "Arjuna"@en, "अर्जुन"@sa-Deva, "Arjuna"@sa-Latn ;
+    skos:altLabel "Partha"@en, "Dhananjaya"@en, "Savyasachi"@en, "Phalguna"@en, "Kiriti"@en, "Bibhatsu"@en, "Jishnu"@en, "Vijaya"@en, "Shvetavahana"@en, "Gudakesha"@en, "Brihannala"@en, "पार्थ"@sa-Deva, "धनञ्जय"@sa-Deva, "Pārtha"@sa-Latn, "Dhanañjaya"@sa-Latn, "Savyasācin"@sa-Latn, "Bṛhannalā"@sa-Latn ;
+    skos:hiddenLabel "Arjun"@en, "Arjunan"@en ;
+    skos:definition "Third Pandava, son of Kunti and Indra, the greatest archer of the epic, Krishna's friend and brother-in-law, and the hearer of the Bhagavad Gita."@en ;
+    skos:note "He won Draupadi at her swayamvara. He married Ulupi, Chitrangada and Subhadra during and after his year of pilgrimage. His bow Gandiva came from Agni at the burning of the Khandava forest. He spent the thirteenth year of exile as the dance teacher Brihannala. In the war he brought down Bhishma, killed Jayadratha, Bhagadatta, Sudakshina, Bhurishravas (disarmed), Vrishasena, Karna and Susharma, with Krishna as his charioteer. His flag carried Hanuman."@en ;
+    mbhx:childOf mbh:kunti, mbh:pandu, mbh:indra ;
+    mbhx:studentOf mbh:drona ;
+    mbhx:friendOf mbh:krishna ;
+    mbhx:rivalOf mbh:karna ;
+    skos:exactMatch wd:Q185790, dbr:Arjuna ;
+    foaf:isPrimaryTopicOf wp:Arjuna .
+
+mbh:nakula a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:pandavas ;
+    skos:prefLabel "Nakula"@en, "नकुल"@sa-Deva, "Nakula"@sa-Latn ;
+    skos:altLabel "Granthika"@en ;
+    skos:hiddenLabel "Nakul"@en ;
+    skos:definition "Fourth Pandava, elder twin son of Madri and the Ashvins, famed for his beauty, horsemanship and swordsmanship."@en ;
+    skos:note "At Virata's court he served as the horse keeper Granthika. He fought Karna on day 17 and was spared because of Karna's promise to Kunti."@en ;
+    mbhx:childOf mbh:madri, mbh:pandu, mbh:ashvins ;
+    mbhx:studentOf mbh:drona ;
+    skos:exactMatch wd:Q1978476, dbr:Nakula ;
+    foaf:isPrimaryTopicOf wp:Nakula .
+
+mbh:sahadeva a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:pandavas ;
+    skos:prefLabel "Sahadeva"@en, "सहदेव"@sa-Deva, "Sahadeva"@sa-Latn ;
+    skos:altLabel "Tantipala"@en ;
+    skos:hiddenLabel "Sahadev"@en ;
+    skos:definition "Youngest Pandava, twin son of Madri and the Ashvins, learned in astrology and the scriptures; he kills Shakuni and Uluka on the last day of the war."@en ;
+    skos:note "At Virata's court he served as the cowherd Tantipala. He had vowed to kill Shakuni for the dice game."@en ;
+    mbhx:childOf mbh:madri, mbh:pandu, mbh:ashvins ;
+    mbhx:studentOf mbh:drona ;
+    skos:exactMatch wd:Q2044641, dbr:Sahadeva ;
+    foaf:isPrimaryTopicOf wp:Sahadeva .
+
+# 4.4 Kauravas
+
+mbh:duryodhana a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kauravas ;
+    skos:prefLabel "Duryodhana"@en, "दुर्योधन"@sa-Deva, "Duryodhana"@sa-Latn ;
+    skos:altLabel "Suyodhana"@en, "सुयोधन"@sa-Deva, "Suyodhana"@sa-Latn ;
+    skos:hiddenLabel "Duryodhan"@en, "Duryodhanan"@en ;
+    skos:definition "Eldest of the hundred Kauravas, son of Dhritarashtra and Gandhari, the Pandavas' rival from childhood who refuses to share the kingdom and leads the Kaurava side in the war."@en ;
+    skos:note "Humiliated at Yudhishthira's palace at Indraprastha, he staged the dice game on Shakuni's advice. He made Karna king of Anga and kept him as his closest friend. Bhima broke his thighs in the final mace duel on day 18, as he had vowed."@en ;
+    mbhx:childOf mbh:dhritarashtra, mbh:gandhari ;
+    mbhx:studentOf mbh:drona, mbh:balarama ;
+    mbhx:friendOf mbh:karna ;
+    mbhx:killedBy mbh:bhima ;
+    mbhx:fellOnWarDay 18 ;
+    skos:exactMatch wd:Q1405823, dbr:Duryodhana ;
+    foaf:isPrimaryTopicOf wp:Duryodhana .
+
+mbh:dushasana a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kauravas ;
+    skos:prefLabel "Dushasana"@en, "दुःशासन"@sa-Deva, "Duḥśāsana"@sa-Latn ;
+    skos:hiddenLabel "Duhshasana"@en, "Dusshasana"@en, "Dushasan"@en ;
+    skos:definition "Second of the Kauravas, who dragged Draupadi by the hair into the assembly after the dice game and tried to strip her; Bhima kills him on day 17 and drinks his blood as he had vowed."@en ;
+    mbhx:childOf mbh:dhritarashtra, mbh:gandhari ;
+    mbhx:studentOf mbh:drona ;
+    mbhx:killedBy mbh:bhima ;
+    mbhx:fellOnWarDay 17 ;
+    skos:exactMatch wd:Q2044646, dbr:Duhshasana ;
+    foaf:isPrimaryTopicOf wp:Duhshasana .
+
+mbh:vikarna a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kauravas ;
+    skos:prefLabel "Vikarna"@en, "विकर्ण"@sa-Deva, "Vikarṇa"@sa-Latn ;
+    skos:definition "A Kaurava who alone among his brothers spoke against the staking and humiliation of Draupadi at the dice game, and who still fought for Duryodhana; Bhima kills him with regret."@en ;
+    mbhx:childOf mbh:dhritarashtra, mbh:gandhari ;
+    mbhx:killedBy mbh:bhima ;
+    mbhx:fellOnWarDay 14 ;
+    skos:exactMatch wd:Q7929388, dbr:Vikarna ;
+    foaf:isPrimaryTopicOf wp:Vikarna .
+
+mbh:yuyutsu a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kauravas ;
+    skos:prefLabel "Yuyutsu"@en, "युयुत्सु"@sa-Deva, "Yuyutsu"@sa-Latn ;
+    skos:definition "Son of Dhritarashtra by a Vaishya woman of the household, and so half-brother of the Kauravas; he crossed to the Pandava side when the armies were drawn up and survived the war."@en ;
+    skos:note "After the war Yudhishthira left him as a guardian of Hastinapura for Parikshit."@en ;
+    mbhx:childOf mbh:dhritarashtra ;
+    skos:exactMatch wd:Q2392426, dbr:Yuyutsu ;
+    foaf:isPrimaryTopicOf wp:Yuyutsu .
+
+mbh:dussala a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kauravas ;
+    skos:prefLabel "Dussala"@en, "दुःशला"@sa-Deva, "Duḥśalā"@sa-Latn ;
+    skos:hiddenLabel "Duhshala"@en, "Dushala"@en, "Duhsala"@en ;
+    skos:definition "Only daughter of Dhritarashtra and Gandhari, wife of Jayadratha of Sindhu."@en ;
+    mbhx:childOf mbh:dhritarashtra, mbh:gandhari ;
+    skos:exactMatch wd:Q2723039, dbr:Duhshala ;
+    foaf:isPrimaryTopicOf wp:Duhshala .
+
+# 4.5 Children of the Kauravas
+
+mbh:lakshmana-kumara a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:children-of-the-kauravas ;
+    skos:prefLabel "Lakshmana Kumara"@en, "लक्ष्मण कुमार"@sa-Deva, "Lakṣmaṇa Kumāra"@sa-Latn ;
+    skos:altLabel "Lakshmana (son of Duryodhana)"@en ;
+    skos:hiddenLabel "Lakshman Kumar"@en ;
+    skos:definition "Son of Duryodhana, killed by Abhimanyu inside Drona's circular battle formation on day 13."@en ;
+    mbhx:childOf mbh:duryodhana ;
+    mbhx:killedBy mbh:abhimanyu ;
+    mbhx:fellOnWarDay 13 ;
+    skos:exactMatch wd:Q6505158, <http://dbpedia.org/resource/Lakshmana_(Mahabharata)> ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Lakshmana_(Mahabharata)> .
+
+mbh:durmasena a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:children-of-the-kauravas ;
+    skos:prefLabel "Durmasena"@en ;
+    skos:altLabel "Dauhshasani"@en, "दौःशासनि"@sa-Deva, "Dauḥśāsani"@sa-Latn ;
+    skos:definition "Son of Dushasana, who struck the final mace blow that killed the exhausted Abhimanyu on day 13; the sons of Draupadi killed him the next day."@en ;
+    skos:scopeNote "The epic names him by the patronymic Dauhshasani; Durmasena is the name used in later tradition."@en ;
+    mbhx:childOf mbh:dushasana ;
+    mbhx:fellOnWarDay 14 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/List_of_characters_in_the_Mahabharata> .
+
+# 4.6 Consorts of the Pandavas
+
+mbh:draupadi a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:consorts-of-the-pandavas, mbh:panchala ;
+    skos:prefLabel "Draupadi"@en, "द्रौपदी"@sa-Deva, "Draupadī"@sa-Latn ;
+    skos:altLabel "Krishnaa"@en, "Panchali"@en, "Yajnaseni"@en, "Sairandhri"@en, "Malini"@en, "Parshati"@en, "कृष्णा"@sa-Deva, "पाञ्चाली"@sa-Deva, "Kṛṣṇā"@sa-Latn, "Pāñcālī"@sa-Latn, "Yājñasenī"@sa-Latn ;
+    skos:hiddenLabel "Drupadi"@en, "Dropadi"@en, "Draupathi"@en ;
+    skos:definition "Daughter of Drupada, born from the sacrificial fire, won by Arjuna at her swayamvara and married to all five Pandavas; her humiliation after the dice game drives the war."@en ;
+    skos:note "Krishna made her garment endless when Dushasana tried to strip her. She vowed to leave her hair unbound until the Kauravas were punished. At Virata's court she served the queen as the maid Sairandhri under the name Malini, and Kichaka's pursuit of her cost him his life. Her five sons were killed in the night raid after the war. She was the first to fall on the final journey."@en ;
+    mbhx:childOf mbh:drupada ;
+    mbhx:spouseOf mbh:yudhishthira, mbh:bhima, mbh:arjuna, mbh:nakula, mbh:sahadeva ;
+    skos:exactMatch wd:Q1057886, dbr:Draupadi ;
+    foaf:isPrimaryTopicOf wp:Draupadi .
+
+mbh:hidimbi a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:consorts-of-the-pandavas, mbh:rakshasas ;
+    skos:prefLabel "Hidimbi"@en, "हिडिम्बा"@sa-Deva, "Hiḍimbā"@sa-Latn ;
+    skos:altLabel "Hidimba (rakshasi)"@en ;
+    skos:hiddenLabel "Hidimbaa"@en, "Hidimvi"@en ;
+    skos:definition "Rakshasa woman, sister of Hidimba, who fell in love with Bhima after the escape from the house of lac, married him and bore Ghatotkacha."@en ;
+    mbhx:siblingOf mbh:hidimba ;
+    mbhx:spouseOf mbh:bhima ;
+    skos:exactMatch wd:Q2472701, dbr:Hidimbi ;
+    foaf:isPrimaryTopicOf wp:Hidimbi .
+
+mbh:ulupi a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:consorts-of-the-pandavas, mbh:nagas ;
+    skos:prefLabel "Ulupi"@en, "उलूपी"@sa-Deva, "Ulūpī"@sa-Latn ;
+    skos:hiddenLabel "Uloopi"@en ;
+    skos:definition "Naga princess, daughter of the serpent king Kauravya, who married Arjuna during his pilgrimage and bore Iravan; she later restored Arjuna to life after Babruvahana killed him."@en ;
+    mbhx:spouseOf mbh:arjuna ;
+    skos:exactMatch wd:Q2723089, dbr:Ulupi ;
+    foaf:isPrimaryTopicOf wp:Ulupi .
+
+mbh:chitrangada-manipura a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:consorts-of-the-pandavas, mbh:kingdom-manipura ;
+    skos:prefLabel "Chitrangada (princess of Manipura)"@en, "चित्राङ्गदा"@sa-Deva, "Citrāṅgadā"@sa-Latn ;
+    skos:definition "Princess of Manipura, daughter of King Chitravahana, who married Arjuna on condition that their son would stay as her father's heir; mother of Babruvahana."@en ;
+    skos:scopeNote "Not the son of Shantanu of the same name; see Chitrangada (son of Shantanu)."@en ;
+    mbhx:spouseOf mbh:arjuna ;
+    skos:exactMatch wd:Q2367305, <http://dbpedia.org/resource/Chitrangada_(princess)> ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Chitrangada_(princess)> .
+
+mbh:subhadra a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:consorts-of-the-pandavas, mbh:yadavas ;
+    skos:prefLabel "Subhadra"@en, "सुभद्रा"@sa-Deva, "Subhadrā"@sa-Latn ;
+    skos:definition "Daughter of Vasudeva and sister of Krishna and Balarama, who eloped with Arjuna with Krishna's connivance; mother of Abhimanyu."@en ;
+    mbhx:childOf mbh:vasudeva ;
+    mbhx:spouseOf mbh:arjuna ;
+    skos:exactMatch wd:Q1982348, dbr:Subhadra ;
+    foaf:isPrimaryTopicOf wp:Subhadra .
+
+# 4.7 Children of the Pandavas
+
+mbh:abhimanyu a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:children-of-the-pandavas ;
+    skos:prefLabel "Abhimanyu"@en, "अभिमन्यु"@sa-Deva, "Abhimanyu"@sa-Latn ;
+    skos:altLabel "Saubhadra"@en, "सौभद्र"@sa-Deva, "Saubhadra"@sa-Latn ;
+    skos:definition "Son of Arjuna and Subhadra and husband of Uttara of Matsya; at sixteen he broke alone into Drona's circular formation on day 13 and was killed there by many warriors at once, against the rules of war."@en ;
+    skos:note "Jayadratha held the other Pandavas outside the formation. Abhimanyu killed Lakshmana Kumara before he fell; the final blow came from Dushasana's son. His posthumous son Parikshit continued the Kuru line."@en ;
+    mbhx:childOf mbh:arjuna, mbh:subhadra ;
+    mbhx:spouseOf mbh:uttaraa ;
+    mbhx:killedBy mbh:durmasena ;
+    mbhx:fellOnWarDay 13 ;
+    skos:exactMatch wd:Q320606, dbr:Abhimanyu ;
+    foaf:isPrimaryTopicOf wp:Abhimanyu .
+
+mbh:ghatotkacha a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:children-of-the-pandavas, mbh:rakshasas ;
+    skos:prefLabel "Ghatotkacha"@en, "घटोत्कच"@sa-Deva, "Ghaṭotkaca"@sa-Latn ;
+    skos:hiddenLabel "Ghatotkach"@en ;
+    skos:definition "Rakshasa son of Bhima and Hidimbi, whose night attack on day 14 forced Karna to spend on him the weapon from Indra he had kept for Arjuna."@en ;
+    mbhx:childOf mbh:bhima, mbh:hidimbi ;
+    mbhx:killedBy mbh:karna ;
+    mbhx:fellOnWarDay 14 ;
+    skos:exactMatch wd:Q1976196, dbr:Ghatotkacha ;
+    foaf:isPrimaryTopicOf wp:Ghatotkacha .
+
+mbh:iravan a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:children-of-the-pandavas ;
+    skos:prefLabel "Iravan"@en, "इरावत्"@sa-Deva, "Irāvat"@sa-Latn ;
+    skos:altLabel "Aravan"@en, "इरावान्"@sa-Deva, "Irāvān"@sa-Latn ;
+    skos:hiddenLabel "Iravat"@en ;
+    skos:definition "Son of Arjuna and the Naga Ulupi, who fought for the Pandavas and was killed by the rakshasa Alambusha on day 8."@en ;
+    mbhx:childOf mbh:arjuna, mbh:ulupi ;
+    mbhx:killedBy mbh:alambusha ;
+    mbhx:fellOnWarDay 8 ;
+    skos:exactMatch wd:Q2044664, dbr:Iravan ;
+    foaf:isPrimaryTopicOf wp:Iravan .
+
+mbh:babruvahana a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:children-of-the-pandavas, mbh:kingdom-manipura ;
+    skos:prefLabel "Babruvahana"@en, "बभ्रुवाहन"@sa-Deva, "Babhruvāhana"@sa-Latn ;
+    skos:hiddenLabel "Babhruvahana"@en, "Vabhruvahana"@en ;
+    skos:definition "Son of Arjuna and Chitrangada, king of Manipura, who killed his father in battle during the horse sacrifice without knowing him; Ulupi revived Arjuna with the Nagas' gem."@en ;
+    mbhx:childOf mbh:arjuna, mbh:chitrangada-manipura ;
+    skos:exactMatch wd:Q2472921, dbr:Babhruvahana ;
+    foaf:isPrimaryTopicOf wp:Babhruvahana .
+
+mbh:prativindhya a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:upapandavas ;
+    skos:prefLabel "Prativindhya"@en, "प्रतिविन्ध्य"@sa-Deva, "Prativindhya"@sa-Latn ;
+    skos:definition "Eldest of Draupadi's sons, by Yudhishthira; killed in his sleep by Ashwatthama in the night raid after the war."@en ;
+    mbhx:childOf mbh:yudhishthira, mbh:draupadi ;
+    mbhx:killedBy mbh:ashwatthama ;
+    mbhx:fellOnWarDay 18 ;
+    rdfs:seeAlso wp:Draupadeyas .
+
+mbh:sutasoma a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:upapandavas ;
+    skos:prefLabel "Sutasoma"@en, "सुतसोम"@sa-Deva, "Sutasoma"@sa-Latn ;
+    skos:definition "Son of Draupadi by Bhima; killed in his sleep by Ashwatthama in the night raid after the war."@en ;
+    mbhx:childOf mbh:bhima, mbh:draupadi ;
+    mbhx:killedBy mbh:ashwatthama ;
+    mbhx:fellOnWarDay 18 ;
+    rdfs:seeAlso wp:Draupadeyas .
+
+mbh:shrutakarma a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:upapandavas ;
+    skos:prefLabel "Shrutakarma"@en, "श्रुतकर्मन्"@sa-Deva, "Śrutakarman"@sa-Latn ;
+    skos:altLabel "Shrutakirti"@en, "श्रुतकर्मा"@sa-Deva, "Śrutakarmā"@sa-Latn ;
+    skos:definition "Son of Draupadi by Arjuna; killed in his sleep by Ashwatthama in the night raid after the war."@en ;
+    mbhx:childOf mbh:arjuna, mbh:draupadi ;
+    mbhx:killedBy mbh:ashwatthama ;
+    mbhx:fellOnWarDay 18 ;
+    rdfs:seeAlso wp:Draupadeyas .
+
+mbh:shatanika a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:upapandavas ;
+    skos:prefLabel "Shatanika"@en, "शतानीक"@sa-Deva, "Śatānīka"@sa-Latn ;
+    skos:definition "Son of Draupadi by Nakula; killed in his sleep by Ashwatthama in the night raid after the war."@en ;
+    mbhx:childOf mbh:nakula, mbh:draupadi ;
+    mbhx:killedBy mbh:ashwatthama ;
+    mbhx:fellOnWarDay 18 ;
+    rdfs:seeAlso wp:Draupadeyas .
+
+mbh:shrutasena a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:upapandavas ;
+    skos:prefLabel "Shrutasena"@en, "श्रुतसेन"@sa-Deva, "Śrutasena"@sa-Latn ;
+    skos:definition "Son of Draupadi by Sahadeva; killed in his sleep by Ashwatthama in the night raid after the war."@en ;
+    mbhx:childOf mbh:sahadeva, mbh:draupadi ;
+    mbhx:killedBy mbh:ashwatthama ;
+    mbhx:fellOnWarDay 18 ;
+    rdfs:seeAlso wp:Draupadeyas .
+
+# 4.8 House of Kuru: kings after the war
+
+mbh:parikshit a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:later-kuru-kings ;
+    skos:prefLabel "Parikshit"@en, "परीक्षित्"@sa-Deva, "Parīkṣit"@sa-Latn ;
+    skos:hiddenLabel "Parikshita"@en, "Pariksit"@en ;
+    skos:definition "Son of Abhimanyu and Uttara, born after the war and revived by Krishna after Ashwatthama's weapon had struck him in the womb; he succeeded Yudhishthira and died of the serpent Takshaka's bite."@en ;
+    skos:note "A sage's son cursed him to die within seven days after he insulted the sage; Takshaka carried out the curse."@en ;
+    mbhx:childOf mbh:abhimanyu, mbh:uttaraa ;
+    mbhx:studentOf mbh:kripa ;
+    mbhx:killedBy mbh:takshaka ;
+    skos:exactMatch wd:Q2046277, dbr:Parikshit ;
+    foaf:isPrimaryTopicOf wp:Parikshit .
+
+mbh:janamejaya a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:later-kuru-kings ;
+    skos:prefLabel "Janamejaya"@en, "जनमेजय"@sa-Deva, "Janamejaya"@sa-Latn ;
+    skos:hiddenLabel "Janmejaya"@en, "Janmejay"@en ;
+    skos:definition "Son of Parikshit, who held the snake sacrifice to avenge his father's death; the Mahabharata is recited to him there by Vaishampayana."@en ;
+    skos:note "The sage Astika persuaded him to stop the sacrifice before Takshaka burned."@en ;
+    mbhx:childOf mbh:parikshit ;
+    skos:exactMatch wd:Q616654, dbr:Janamejaya ;
+    foaf:isPrimaryTopicOf wp:Janamejaya .
+
+# 4.9 Yadavas
+
+mbh:krishna a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:yadavas, mbh:deities ;
+    skos:prefLabel "Krishna"@en, "कृष्ण"@sa-Deva, "Kṛṣṇa"@sa-Latn ;
+    skos:altLabel "Keshava"@en, "Madhava"@en, "Govinda"@en, "Hrishikesha"@en, "Janardana"@en, "Madhusudana"@en, "Achyuta"@en, "Parthasarathi"@en, "Varshneya"@en, "वासुदेव"@sa-Deva, "केशव"@sa-Deva, "माधव"@sa-Deva, "गोविन्द"@sa-Deva, "Vāsudeva"@sa-Latn, "Keśava"@sa-Latn, "Mādhava"@sa-Latn, "Govinda"@sa-Latn, "Hṛṣīkeśa"@sa-Latn, "Janārdana"@sa-Latn ;
+    skos:hiddenLabel "Krishn"@en, "Krsna"@en, "Kanha"@en, "Shri Krishna"@en ;
+    skos:definition "Prince of the Yadavas, son of Vasudeva, avatar of Vishnu, cousin and counsellor of the Pandavas and Arjuna's charioteer in the war, who speaks the Bhagavad Gita."@en ;
+    skos:note "Kunti is his father's sister. He protected Draupadi at the dice game, killed Shishupala at Yudhishthira's consecration, went to Hastinapura as the Pandavas' envoy before the war, and cursed Ashwatthama after the night raid. Gandhari's curse brought the destruction of his clan thirty-six years after the war; he died when the hunter Jara's arrow struck his foot."@en ;
+    mbhx:childOf mbh:vasudeva ;
+    mbhx:avatarOf mbh:vishnu ;
+    mbhx:charioteerOf mbh:arjuna ;
+    mbhx:friendOf mbh:draupadi ;
+    mbhx:cursed mbh:ashwatthama ;
+    skos:exactMatch wd:Q42891, dbr:Krishna ;
+    foaf:isPrimaryTopicOf wp:Krishna .
+
+mbh:balarama a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:yadavas ;
+    skos:prefLabel "Balarama"@en, "बलराम"@sa-Deva, "Balarāma"@sa-Latn ;
+    skos:altLabel "Baladeva"@en, "Balabhadra"@en, "Halayudha"@en, "Sankarshana"@en, "Rauhineya"@en, "बलदेव"@sa-Deva, "Baladeva"@sa-Latn, "Halāyudha"@sa-Latn, "Saṅkarṣaṇa"@sa-Latn ;
+    skos:hiddenLabel "Balram"@en, "Balaram"@en ;
+    skos:definition "Elder brother of Krishna, son of Vasudeva and Rohini, who bears the plough as his weapon; he taught mace fighting to Duryodhana and Bhima and refused to fight in the war, leaving on pilgrimage instead."@en ;
+    skos:note "He returned on the last day and objected to Bhima's blow below the waist in the duel with Duryodhana."@en ;
+    mbhx:childOf mbh:vasudeva ;
+    skos:exactMatch wd:Q1061606, dbr:Balarama ;
+    foaf:isPrimaryTopicOf wp:Balarama .
+
+mbh:vasudeva a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:yadavas ;
+    skos:prefLabel "Vasudeva"@en, "वसुदेव"@sa-Deva, "Vasudeva"@sa-Latn ;
+    skos:altLabel "Anakadundubhi"@en ;
+    skos:definition "Yadava prince, son of Shurasena and brother of Kunti; father of Balarama, Krishna and Subhadra."@en ;
+    skos:scopeNote "Distinct from Vāsudeva with a long first vowel, a patronymic name of Krishna."@en ;
+    skos:exactMatch wd:Q890382, dbr:Vasudeva ;
+    foaf:isPrimaryTopicOf wp:Vasudeva .
+
+mbh:satyaki a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:yadavas ;
+    skos:prefLabel "Satyaki"@en, "सात्यकि"@sa-Deva, "Sātyaki"@sa-Latn ;
+    skos:altLabel "Yuyudhana"@en, "Shaineya"@en, "युयुधान"@sa-Deva, "Yuyudhāna"@sa-Latn, "Śaineya"@sa-Latn ;
+    skos:hiddenLabel "Satyaki Yuyudhana"@en ;
+    skos:definition "Vrishni warrior, grandson of Shini and student of Arjuna, who fought for the Pandavas and beheaded Bhurishravas while he sat in meditation after losing his arm; one of the survivors of the war."@en ;
+    skos:note "He died in the brawl at Prabhasa that destroyed the Yadavas, after killing Kritavarma for his part in the night raid."@en ;
+    mbhx:studentOf mbh:arjuna ;
+    mbhx:rivalOf mbh:bhurishravas ;
+    skos:exactMatch wd:Q2381158, dbr:Satyaki ;
+    foaf:isPrimaryTopicOf wp:Satyaki .
+
+mbh:kritavarma a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:yadavas ;
+    skos:prefLabel "Kritavarma"@en, "कृतवर्मन्"@sa-Deva, "Kṛtavarman"@sa-Latn ;
+    skos:altLabel "कृतवर्मा"@sa-Deva, "Kṛtavarmā"@sa-Latn ;
+    skos:hiddenLabel "Kritavarman"@en, "Kritverma"@en ;
+    skos:definition "Bhoja king of the Yadavas who fought for the Kauravas, took part with Ashwatthama and Kripa in the night raid on the Pandava camp, and survived the war; Satyaki killed him in the Yadava brawl at Prabhasa."@en ;
+    mbhx:killedBy mbh:satyaki ;
+    skos:exactMatch wd:Q2669309, dbr:Kritavarma ;
+    foaf:isPrimaryTopicOf wp:Kritavarma .
+
+mbh:kuntibhoja a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:yadavas ;
+    skos:prefLabel "Kuntibhoja"@en, "कुन्तिभोज"@sa-Deva, "Kuntibhoja"@sa-Latn ;
+    skos:hiddenLabel "Kunti-Bhoja"@en ;
+    skos:definition "Childless cousin of Shurasena who adopted Shurasena's daughter Pritha, thereafter called Kunti; the sage Durvasa gave her the mantra for sons while a guest at his court."@en ;
+    skos:exactMatch wd:Q4210132 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/List_of_characters_in_the_Mahabharata> .
+
+# 4.10 Royal house of Panchala
+
+mbh:drupada a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:panchala ;
+    skos:prefLabel "Drupada"@en, "द्रुपद"@sa-Deva, "Drupada"@sa-Latn ;
+    skos:altLabel "Yajnasena"@en, "यज्ञसेन"@sa-Deva, "Yajñasena"@sa-Latn ;
+    skos:hiddenLabel "Drupad"@en ;
+    skos:definition "King of Panchala, Drona's boyhood friend and later his enemy, who held a sacrifice for a son to kill Drona and received Dhrishtadyumna and Draupadi from the fire; he fought for the Pandavas and was killed by Drona."@en ;
+    skos:note "Drona had him defeated by his students and took half his kingdom in payment for a childhood insult."@en ;
+    mbhx:rivalOf mbh:drona ;
+    mbhx:killedBy mbh:drona ;
+    mbhx:fellOnWarDay 15 ;
+    skos:exactMatch wd:Q2389430, dbr:Drupada ;
+    foaf:isPrimaryTopicOf wp:Drupada .
+
+mbh:dhrishtadyumna a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:panchala ;
+    skos:prefLabel "Dhrishtadyumna"@en, "धृष्टद्युम्न"@sa-Deva, "Dhṛṣṭadyumna"@sa-Latn ;
+    skos:hiddenLabel "Dhrishtadyumn"@en, "Drishtadyumna"@en ;
+    skos:definition "Son of Drupada born from the sacrificial fire to kill Drona, commander-in-chief of the Pandava army for the whole war; he beheaded Drona on day 15 and was killed by Ashwatthama in the night raid."@en ;
+    mbhx:childOf mbh:drupada ;
+    mbhx:killedBy mbh:ashwatthama ;
+    mbhx:fellOnWarDay 18 ;
+    skos:exactMatch wd:Q2357086, dbr:Dhrishtadyumna ;
+    foaf:isPrimaryTopicOf wp:Dhrishtadyumna .
+
+mbh:shikhandi a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:panchala ;
+    skos:prefLabel "Shikhandi"@en, "शिखण्डिन्"@sa-Deva, "Śikhaṇḍin"@sa-Latn ;
+    skos:altLabel "Shikhandini"@en, "शिखण्डी"@sa-Deva, "शिखण्डिनी"@sa-Deva, "Śikhaṇḍī"@sa-Latn, "Śikhaṇḍinī"@sa-Latn ;
+    skos:hiddenLabel "Shikhandin"@en, "Sikhandi"@en ;
+    skos:definition "Child of Drupada, born a girl as the rebirth of Amba and later made a man by exchanging sex with a yaksha; Bhishma refused to fight him, and Arjuna shot Bhishma down from behind him on day 10."@en ;
+    skos:note "Killed by Ashwatthama in the night raid after the war."@en ;
+    mbhx:childOf mbh:drupada ;
+    mbhx:rebirthOf mbh:amba ;
+    mbhx:killedBy mbh:ashwatthama ;
+    mbhx:fellOnWarDay 18 ;
+    skos:exactMatch wd:Q2357063, dbr:Shikhandi ;
+    foaf:isPrimaryTopicOf wp:Shikhandi .
+
+mbh:yudhamanyu a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:panchala ;
+    skos:prefLabel "Yudhamanyu"@en, "युधामन्यु"@sa-Deva, "Yudhāmanyu"@sa-Latn ;
+    skos:definition "Panchala prince who, with Uttamaujas, guarded the wheels of Arjuna's chariot through the war; killed by Ashwatthama in the night raid."@en ;
+    mbhx:killedBy mbh:ashwatthama ;
+    mbhx:fellOnWarDay 18 ;
+    skos:closeMatch wd:Q15645224 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/List_of_characters_in_the_Mahabharata> .
+
+mbh:uttamaujas a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:panchala ;
+    skos:prefLabel "Uttamaujas"@en, "उत्तमौजस्"@sa-Deva, "Uttamaujas"@sa-Latn ;
+    skos:definition "Panchala prince who, with Yudhamanyu, guarded the wheels of Arjuna's chariot through the war; killed by Ashwatthama in the night raid."@en ;
+    mbhx:killedBy mbh:ashwatthama ;
+    mbhx:fellOnWarDay 18 ;
+    skos:closeMatch wd:Q15645224 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/List_of_characters_in_the_Mahabharata> .
+
+# 4.11 Other royal houses
+
+mbh:virata a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-matsya ;
+    skos:prefLabel "Virata"@en, "विराट"@sa-Deva, "Virāṭa"@sa-Latn ;
+    skos:hiddenLabel "Virat"@en ;
+    skos:definition "King of Matsya, at whose court the Pandavas lived in disguise during the thirteenth year of exile; he fought for the Pandavas and was killed by Drona."@en ;
+    mbhx:spouseOf mbh:sudeshna ;
+    mbhx:killedBy mbh:drona ;
+    mbhx:fellOnWarDay 15 ;
+    skos:exactMatch wd:Q2978459, dbr:Virata ;
+    foaf:isPrimaryTopicOf wp:Virata .
+
+mbh:sudeshna a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-matsya ;
+    skos:prefLabel "Sudeshna"@en, "सुदेष्णा"@sa-Deva, "Sudeṣṇā"@sa-Latn ;
+    skos:definition "Queen of Matsya, wife of Virata and sister of Kichaka, who took Draupadi into her service as the maid Sairandhri."@en ;
+    mbhx:siblingOf mbh:kichaka ;
+    skos:exactMatch wd:Q15290894, dbr:Sudeshna ;
+    foaf:isPrimaryTopicOf wp:Sudeshna .
+
+mbh:kichaka a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-matsya ;
+    skos:prefLabel "Kichaka"@en, "कीचक"@sa-Deva, "Kīcaka"@sa-Latn ;
+    skos:hiddenLabel "Keechaka"@en, "Keechak"@en ;
+    skos:definition "Commander of the Matsya army and brother of Queen Sudeshna, who pursued Draupadi during her disguise and was killed by Bhima in the dancing hall at night."@en ;
+    mbhx:killedBy mbh:bhima ;
+    skos:exactMatch wd:Q2382488, dbr:Kichaka ;
+    foaf:isPrimaryTopicOf wp:Kichaka .
+
+mbh:uttara a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-matsya ;
+    skos:prefLabel "Uttara (prince of Matsya)"@en, "उत्तर"@sa-Deva, "Uttara"@sa-Latn ;
+    skos:altLabel "Bhuminjaya"@en, "भूमिञ्जय"@sa-Deva, "Bhūmiñjaya"@sa-Latn ;
+    skos:hiddenLabel "Uttar"@en, "Uttara Kumara"@en ;
+    skos:definition "Prince of Matsya, son of Virata and Sudeshna, who drove Arjuna's chariot against the Kaurava cattle raid when Arjuna was still disguised as Brihannala; killed by Shalya on the first day of the war."@en ;
+    mbhx:childOf mbh:virata, mbh:sudeshna ;
+    mbhx:charioteerOf mbh:arjuna ;
+    mbhx:killedBy mbh:shalya ;
+    mbhx:fellOnWarDay 1 ;
+    skos:exactMatch wd:Q4209828, <http://dbpedia.org/resource/Uttara_(Mahabharata)> ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Uttara_(Mahabharata)> .
+
+mbh:uttaraa a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-matsya ;
+    skos:prefLabel "Uttara (princess of Matsya)"@en, "उत्तरा"@sa-Deva, "Uttarā"@sa-Latn ;
+    skos:hiddenLabel "Uttaraa"@en ;
+    skos:definition "Princess of Matsya, daughter of Virata and Sudeshna, wife of Abhimanyu and mother of Parikshit, born after his father's death."@en ;
+    mbhx:childOf mbh:virata, mbh:sudeshna ;
+    skos:exactMatch wd:Q2389445, <http://dbpedia.org/resource/Uttarā> ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Uttarā> .
+
+mbh:shalya a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-madra ;
+    skos:prefLabel "Shalya"@en, "शल्य"@sa-Deva, "Śalya"@sa-Latn ;
+    skos:hiddenLabel "Salya"@en, "Shalya of Madra"@en ;
+    skos:definition "King of Madra, brother of Madri and uncle of Nakula and Sahadeva, whom Duryodhana won over with lavish hospitality on his way to join the Pandavas; he drove Karna's chariot and commanded the Kaurava army on the last day, when Yudhishthira killed him."@en ;
+    mbhx:charioteerOf mbh:karna ;
+    mbhx:killedBy mbh:yudhishthira ;
+    mbhx:fellOnWarDay 18 ;
+    skos:exactMatch wd:Q2381126, dbr:Shalya ;
+    foaf:isPrimaryTopicOf wp:Shalya .
+
+mbh:shakuni a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-gandhara ;
+    skos:prefLabel "Shakuni"@en, "शकुनि"@sa-Deva, "Śakuni"@sa-Latn ;
+    skos:altLabel "Saubala"@en, "सौबल"@sa-Deva, "Saubala"@sa-Latn ;
+    skos:hiddenLabel "Sakuni"@en, "Shakuni Mama"@en ;
+    skos:definition "Prince of Gandhara, son of Subala, brother of Gandhari and uncle of Duryodhana; he planned the house of lac and won the dice game for Duryodhana with loaded dice, and was killed by Sahadeva on the last day of the war."@en ;
+    mbhx:killedBy mbh:sahadeva ;
+    mbhx:fellOnWarDay 18 ;
+    skos:exactMatch wd:Q1992668, dbr:Shakuni ;
+    foaf:isPrimaryTopicOf wp:Shakuni .
+
+mbh:uluka a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-gandhara ;
+    skos:prefLabel "Uluka"@en, "उलूक"@sa-Deva, "Ulūka"@sa-Latn ;
+    skos:definition "Son of Shakuni, sent by Duryodhana to the Pandava camp on the eve of the war to deliver his insults; killed by Sahadeva on the last day."@en ;
+    mbhx:childOf mbh:shakuni ;
+    mbhx:killedBy mbh:sahadeva ;
+    mbhx:fellOnWarDay 18 ;
+    skos:exactMatch wd:Q7880794, dbr:Uluka ;
+    foaf:isPrimaryTopicOf wp:Uluka .
+
+mbh:karna a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-anga, mbh:sutas ;
+    skos:prefLabel "Karna"@en, "कर्ण"@sa-Deva, "Karṇa"@sa-Latn ;
+    skos:altLabel "Radheya"@en, "Vasusena"@en, "Vaikartana"@en, "Sutaputra"@en, "Angaraja"@en, "राधेय"@sa-Deva, "वसुषेण"@sa-Deva, "Rādheya"@sa-Latn, "Vasuṣeṇa"@sa-Latn, "Vaikartana"@sa-Latn ;
+    skos:hiddenLabel "Karn"@en, "Karnan"@en ;
+    skos:definition "Son of Kunti by the sun god Surya, born before her marriage and set adrift; raised by the charioteer Adhiratha and his wife Radha, made king of Anga by Duryodhana, and the Pandavas' greatest opponent, killed by Arjuna on day 17."@en ;
+    skos:note "He was born with armour and earrings that made him invulnerable, which he gave to Indra in exchange for a single-use spear; he spent the spear on Ghatotkacha. Parashurama taught him and then cursed him to forget the supreme weapon at the hour of need. He promised Kunti to spare all her sons but Arjuna. He commanded the Kaurava army on days 16 and 17 and died while lifting his chariot wheel from the mud."@en ;
+    mbhx:childOf mbh:kunti, mbh:surya ;
+    mbhx:fosterChildOf mbh:adhiratha, mbh:radha ;
+    mbhx:studentOf mbh:drona, mbh:parashurama ;
+    mbhx:killedBy mbh:arjuna ;
+    mbhx:fellOnWarDay 17 ;
+    skos:exactMatch wd:Q2727397, dbr:Karna ;
+    foaf:isPrimaryTopicOf wp:Karna .
+
+mbh:vrishasena a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-anga ;
+    skos:prefLabel "Vrishasena"@en, "वृषसेन"@sa-Deva, "Vṛṣasena"@sa-Latn ;
+    skos:definition "Eldest son of Karna, killed by Arjuna before his father's eyes on day 17."@en ;
+    mbhx:childOf mbh:karna ;
+    mbhx:killedBy mbh:arjuna ;
+    mbhx:fellOnWarDay 17 ;
+    skos:exactMatch wd:Q24054436, dbr:Vrishasena ;
+    foaf:isPrimaryTopicOf wp:Vrishasena .
+
+mbh:amba a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-kashi ;
+    skos:prefLabel "Amba"@en, "अम्बा"@sa-Deva, "Ambā"@sa-Latn ;
+    skos:definition "Eldest princess of Kashi, carried off by Bhishma, then rejected by the king of Shalva whom she loved and refused by Bhishma because of his vow; she vowed to cause Bhishma's death and was reborn as Shikhandi."@en ;
+    skos:note "She sought Parashurama's help; his duel with Bhishma ended without a result."@en ;
+    mbhx:rivalOf mbh:bhishma ;
+    skos:exactMatch wd:Q2721773, <http://dbpedia.org/resource/Amba_(Mahabharata)> ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Amba_(Mahabharata)> .
+
+mbh:jayadratha a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-sindhu ;
+    skos:prefLabel "Jayadratha"@en, "जयद्रथ"@sa-Deva, "Jayadratha"@sa-Latn ;
+    skos:hiddenLabel "Jayadrath"@en ;
+    skos:definition "King of Sindhu and husband of Dussala, who abducted Draupadi during the exile and was spared; a boon from Shiva let him hold off four Pandavas on day 13 while Abhimanyu died, and Arjuna killed him at sunset on day 14."@en ;
+    mbhx:spouseOf mbh:dussala ;
+    mbhx:killedBy mbh:arjuna ;
+    mbhx:fellOnWarDay 14 ;
+    skos:exactMatch wd:Q2381146, dbr:Jayadratha ;
+    foaf:isPrimaryTopicOf wp:Jayadratha .
+
+mbh:jarasandha a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-magadha ;
+    skos:prefLabel "Jarasandha"@en, "जरासन्ध"@sa-Deva, "Jarāsandha"@sa-Latn ;
+    skos:hiddenLabel "Jarasandh"@en ;
+    skos:definition "King of Magadha who imprisoned kings for a human sacrifice; Bhima killed him in a wrestling match on Krishna's advice, which freed the kings and opened the way to Yudhishthira's royal consecration."@en ;
+    mbhx:killedBy mbh:bhima ;
+    skos:exactMatch wd:Q2723062, dbr:Jarasandha ;
+    foaf:isPrimaryTopicOf wp:Jarasandha .
+
+mbh:shishupala a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-chedi ;
+    skos:prefLabel "Shishupala"@en, "शिशुपाल"@sa-Deva, "Śiśupāla"@sa-Latn ;
+    skos:hiddenLabel "Sisupala"@en, "Shishupal"@en ;
+    skos:definition "King of Chedi and Krishna's cousin, who insulted Krishna at Yudhishthira's royal consecration until he exhausted the hundred insults Krishna had promised to forgive, and was killed with the discus."@en ;
+    mbhx:killedBy mbh:krishna ;
+    skos:exactMatch wd:Q2978464, dbr:Shishupala ;
+    foaf:isPrimaryTopicOf wp:Shishupala .
+
+mbh:dhrishtaketu a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-chedi ;
+    skos:prefLabel "Dhrishtaketu"@en, "धृष्टकेतु"@sa-Deva, "Dhṛṣṭaketu"@sa-Latn ;
+    skos:definition "King of Chedi after his father Shishupala, one of the seven commanders of the Pandava army; killed by Drona."@en ;
+    mbhx:childOf mbh:shishupala ;
+    mbhx:killedBy mbh:drona ;
+    skos:exactMatch wd:Q135680081, dbr:Dhrishtaketu ;
+    foaf:isPrimaryTopicOf wp:Dhrishtaketu .
+
+mbh:bhagadatta a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-pragjyotisha ;
+    skos:prefLabel "Bhagadatta"@en, "भगदत्त"@sa-Deva, "Bhagadatta"@sa-Latn ;
+    skos:definition "Aged king of Pragjyotisha who fought for the Kauravas on his elephant Supratika; Arjuna killed him on day 12 after Krishna took Bhagadatta's Vaishnava weapon on his own chest."@en ;
+    mbhx:killedBy mbh:arjuna ;
+    mbhx:fellOnWarDay 12 ;
+    skos:exactMatch wd:Q1114098, dbr:Bhagadatta ;
+    foaf:isPrimaryTopicOf wp:Bhagadatta .
+
+mbh:susharma a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-trigarta ;
+    skos:prefLabel "Susharma"@en, "सुशर्मन्"@sa-Deva, "Suśarman"@sa-Latn ;
+    skos:altLabel "सुशर्मा"@sa-Deva, "Suśarmā"@sa-Latn ;
+    skos:hiddenLabel "Susharman"@en, "Sushurma"@en ;
+    skos:definition "King of Trigarta who raided Virata's cattle and in the war led the Samsaptakas, sworn to kill Arjuna or die, to draw Arjuna away from the main battle; Arjuna killed him on day 18."@en ;
+    mbhx:killedBy mbh:arjuna ;
+    mbhx:fellOnWarDay 18 ;
+    skos:exactMatch wd:Q25927082, dbr:Susharma ;
+    foaf:isPrimaryTopicOf wp:Susharma .
+
+mbh:sudakshina a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-kamboja ;
+    skos:prefLabel "Sudakshina"@en, "सुदक्षिण"@sa-Deva, "Sudakṣiṇa"@sa-Latn ;
+    skos:definition "King of the Kambojas who fought for the Kauravas; Arjuna killed him on day 14 on the way to Jayadratha."@en ;
+    mbhx:killedBy mbh:arjuna ;
+    mbhx:fellOnWarDay 14 ;
+    skos:exactMatch wd:Q7633279, dbr:Sudakshina ;
+    foaf:isPrimaryTopicOf wp:Sudakshina .
+
+mbh:somadatta a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-bahlika ;
+    skos:prefLabel "Somadatta"@en, "सोमदत्त"@sa-Deva, "Somadatta"@sa-Latn ;
+    skos:definition "Son of Bahlika and father of Bhurishravas, who fought for the Kauravas and was killed by Satyaki on day 14."@en ;
+    mbhx:childOf mbh:bahlika ;
+    mbhx:killedBy mbh:satyaki ;
+    mbhx:fellOnWarDay 14 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/List_of_characters_in_the_Mahabharata> .
+
+mbh:bhurishravas a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-bahlika ;
+    skos:prefLabel "Bhurishravas"@en, "भूरिश्रवस्"@sa-Deva, "Bhūriśravas"@sa-Latn ;
+    skos:altLabel "भूरिश्रवा"@sa-Deva, "Bhūriśravā"@sa-Latn ;
+    skos:hiddenLabel "Bhurisravas"@en, "Bhurishrava"@en ;
+    skos:definition "Son of Somadatta and grandson of Bahlika, who fought for the Kauravas and carried an old feud with Satyaki; on day 14 Arjuna cut off his arm as he was about to kill Satyaki, and Satyaki beheaded him as he sat in meditation."@en ;
+    mbhx:childOf mbh:somadatta ;
+    mbhx:killedBy mbh:satyaki ;
+    mbhx:fellOnWarDay 14 ;
+    skos:exactMatch wd:Q2724587, dbr:Bhurishravas ;
+    foaf:isPrimaryTopicOf wp:Bhurishravas .
+
+mbh:ekalavya a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-nishada ;
+    skos:prefLabel "Ekalavya"@en, "एकलव्य"@sa-Deva, "Ekalavya"@sa-Latn ;
+    skos:hiddenLabel "Eklavya"@en ;
+    skos:definition "Nishada prince who taught himself archery before an image of Drona after Drona refused him; when Drona claimed his right thumb as a teacher's fee he gave it, and lost his skill. Krishna names him among those he killed."@en ;
+    skos:scopeNote "Not linked to Drona by studentOf: Drona never taught him."@en ;
+    mbhx:killedBy mbh:krishna ;
+    skos:exactMatch wd:Q1987473, dbr:Ekalavya ;
+    foaf:isPrimaryTopicOf wp:Ekalavya .
+
+mbh:rukmi a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:kingdom-vidarbha ;
+    skos:prefLabel "Rukmi"@en, "रुक्मिन्"@sa-Deva, "Rukmin"@sa-Latn ;
+    skos:altLabel "रुक्मी"@sa-Deva, "Rukmī"@sa-Latn ;
+    skos:hiddenLabel "Rukmin"@en ;
+    skos:definition "King of Vidarbha and brother of Krishna's wife Rukmini, who offered his army to each side in turn with such boasting that both refused him; with Balarama he is one of the two warriors who took no part in the war."@en ;
+    skos:exactMatch wd:Q2601106, dbr:Rukmi ;
+    foaf:isPrimaryTopicOf wp:Rukmi .
+
+# 4.12 Sages
+
+mbh:vyasa a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sages ;
+    skos:prefLabel "Vyasa"@en, "व्यास"@sa-Deva, "Vyāsa"@sa-Latn ;
+    skos:altLabel "Krishna Dvaipayana"@en, "Veda Vyasa"@en, "Badarayana"@en, "कृष्णद्वैपायन"@sa-Deva, "वेदव्यास"@sa-Deva, "Kṛṣṇa Dvaipāyana"@sa-Latn, "Vedavyāsa"@sa-Latn ;
+    skos:hiddenLabel "Vyas"@en, "Ved Vyas"@en ;
+    skos:definition "Sage, son of the sage Parashara and Satyavati, composer of the Mahabharata and a character in it: he fathers Dhritarashtra, Pandu and Vidura at Satyavati's request and returns at every turn of the story."@en ;
+    skos:note "He gave Sanjaya the divine sight with which to narrate the war to Dhritarashtra. By a tradition recorded in the first book, Ganesha wrote the poem down as Vyasa dictated it. His disciple Vaishampayana recited it at Janamejaya's snake sacrifice."@en ;
+    mbhx:childOf mbh:satyavati ;
+    skos:exactMatch wd:Q330521, dbr:Vyasa ;
+    foaf:isPrimaryTopicOf wp:Vyasa .
+
+mbh:parashurama a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sages ;
+    skos:prefLabel "Parashurama"@en, "परशुराम"@sa-Deva, "Paraśurāma"@sa-Latn ;
+    skos:altLabel "Bhargava Rama"@en, "Rama Jamadagnya"@en, "भार्गव"@sa-Deva, "Bhārgava"@sa-Latn, "Rāma Jāmadagnya"@sa-Latn ;
+    skos:hiddenLabel "Parshuram"@en, "Parasurama"@en ;
+    skos:definition "Warrior sage with the axe, sixth avatar of Vishnu, teacher of Bhishma, Drona and Karna; he fought Bhishma for Amba's sake without result and cursed Karna, who had hidden his birth from him."@en ;
+    mbhx:avatarOf mbh:vishnu ;
+    mbhx:cursed mbh:karna ;
+    skos:exactMatch wd:Q825682, dbr:Parashurama ;
+    foaf:isPrimaryTopicOf wp:Parashurama .
+
+mbh:narada a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sages ;
+    skos:prefLabel "Narada"@en, "नारद"@sa-Deva, "Nārada"@sa-Latn ;
+    skos:hiddenLabel "Narad"@en, "Narada Muni"@en ;
+    skos:definition "Divine sage who moves between gods and men; he told the Pandavas the story of the brothers Sunda and Upasunda so that they would agree on rules for sharing Draupadi, and advised Yudhishthira on the royal consecration."@en ;
+    skos:exactMatch wd:Q844066, dbr:Narada ;
+    foaf:isPrimaryTopicOf wp:Narada .
+
+mbh:durvasa a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sages ;
+    skos:prefLabel "Durvasa"@en, "दुर्वासस्"@sa-Deva, "Durvāsas"@sa-Latn ;
+    skos:altLabel "दुर्वासा"@sa-Deva, "Durvāsā"@sa-Latn ;
+    skos:hiddenLabel "Durvasas"@en, "Durvasa Muni"@en ;
+    skos:definition "Short-tempered sage who, pleased with the young Kunti's service, gave her the mantra to summon any god for a son; Duryodhana later sent him with his disciples to the Pandavas in exile hoping he would curse them."@en ;
+    skos:note "Krishna satisfied the sage's hunger with the one grain of rice left in Draupadi's vessel."@en ;
+    skos:exactMatch wd:Q2361344, dbr:Durvasa ;
+    foaf:isPrimaryTopicOf wp:Durvasa .
+
+mbh:markandeya a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sages ;
+    skos:prefLabel "Markandeya"@en, "मार्कण्डेय"@sa-Deva, "Mārkaṇḍeya"@sa-Latn ;
+    skos:hiddenLabel "Markandey"@en ;
+    skos:definition "Long-lived sage who visits the Pandavas in the forest and tells them the stories of Rama, of Savitri and of the ages of the world."@en ;
+    skos:exactMatch wd:Q249381, dbr:Markandeya ;
+    foaf:isPrimaryTopicOf wp:Markandeya .
+
+mbh:dhaumya a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sages ;
+    skos:prefLabel "Dhaumya"@en, "धौम्य"@sa-Deva, "Dhaumya"@sa-Latn ;
+    skos:altLabel "Ayoda Dhaumya"@en ;
+    skos:definition "Family priest of the Pandavas, who conducted their marriage to Draupadi and went with them into exile."@en ;
+    skos:exactMatch wd:Q12434693, dbr:Dhaumya ;
+    foaf:isPrimaryTopicOf wp:Dhaumya .
+
+mbh:vaishampayana a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sages ;
+    skos:prefLabel "Vaishampayana"@en, "वैशम्पायन"@sa-Deva, "Vaiśampāyana"@sa-Latn ;
+    skos:hiddenLabel "Vaisampayana"@en, "Vaishampayan"@en ;
+    skos:definition "Disciple of Vyasa who recited the Mahabharata to King Janamejaya at the snake sacrifice; the inner frame of the epic's narration."@en ;
+    mbhx:studentOf mbh:vyasa ;
+    skos:exactMatch wd:Q2477603, dbr:Vaisampayana ;
+    foaf:isPrimaryTopicOf wp:Vaisampayana .
+
+mbh:shaunaka a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sages ;
+    skos:prefLabel "Shaunaka"@en, "शौनक"@sa-Deva, "Śaunaka"@sa-Latn ;
+    skos:hiddenLabel "Saunaka"@en ;
+    skos:definition "Head of the sages at the twelve-year sacrifice in the Naimisha forest, to whom the bard Ugrashravas recites the epic as he heard it at Janamejaya's sacrifice; the outer frame of the narration."@en ;
+    skos:exactMatch wd:Q2073479, dbr:Shaunaka ;
+    foaf:isPrimaryTopicOf wp:Shaunaka .
+
+mbh:astika a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sages ;
+    skos:prefLabel "Astika"@en, "आस्तीक"@sa-Deva, "Āstīka"@sa-Latn ;
+    skos:hiddenLabel "Aastika"@en, "Astik"@en ;
+    skos:definition "Young sage, son of the ascetic Jaratkaru and the serpent king Vasuki's sister, who persuaded Janamejaya to end the snake sacrifice and so saved Takshaka and the Nagas."@en ;
+    skos:exactMatch wd:Q3595632, <http://dbpedia.org/resource/Astika_(sage)> ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Astika_(sage)> .
+
+# 4.13 Brahmin warriors of the Kuru court
+
+mbh:drona a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:warrior-brahmins ;
+    skos:prefLabel "Drona"@en, "द्रोण"@sa-Deva, "Droṇa"@sa-Latn ;
+    skos:altLabel "Dronacharya"@en, "Bharadvaja (patronymic of Drona)"@en, "द्रोणाचार्य"@sa-Deva, "Droṇācārya"@sa-Latn ;
+    skos:hiddenLabel "Dron"@en, "Guru Drona"@en ;
+    skos:definition "Brahmin master of arms, son of the sage Bharadvaja, husband of Kripi and father of Ashwatthama; teacher of the Pandavas and Kauravas, commander of the Kaurava army for days 11 to 15, beheaded by Dhrishtadyumna."@en ;
+    skos:note "He learnt weapons from Parashurama. Humiliated by his boyhood friend Drupada, he had his students conquer Panchala. He demanded Ekalavya's thumb. He laid down his weapons on hearing the false report that Ashwatthama was dead, and Dhrishtadyumna killed him as he sat in meditation."@en ;
+    mbhx:spouseOf mbh:kripi ;
+    mbhx:studentOf mbh:parashurama ;
+    mbhx:killedBy mbh:dhrishtadyumna ;
+    mbhx:fellOnWarDay 15 ;
+    skos:exactMatch wd:Q890529, dbr:Drona ;
+    foaf:isPrimaryTopicOf wp:Drona .
+
+mbh:kripa a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:warrior-brahmins ;
+    skos:prefLabel "Kripa"@en, "कृप"@sa-Deva, "Kṛpa"@sa-Latn ;
+    skos:altLabel "Kripacharya"@en, "Sharadvata"@en, "कृपाचार्य"@sa-Deva, "Kṛpācārya"@sa-Latn, "Śāradvata"@sa-Latn ;
+    skos:hiddenLabel "Krupa"@en, "Kripacharya Sharadvan"@en ;
+    skos:definition "Son of the sage Sharadvan, raised at Shantanu's court with his sister Kripi; first teacher of the Kuru princes, who fought for the Kauravas, survived the war with Ashwatthama and Kritavarma, and later taught Parikshit."@en ;
+    skos:note "Counted among the immortals (chiranjivis)."@en ;
+    mbhx:siblingOf mbh:kripi ;
+    skos:exactMatch wd:Q2044671, dbr:Kripa ;
+    foaf:isPrimaryTopicOf wp:Kripa .
+
+mbh:kripi a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:warrior-brahmins ;
+    skos:prefLabel "Kripi"@en, "कृपी"@sa-Deva, "Kṛpī"@sa-Latn ;
+    skos:definition "Sister of Kripa, wife of Drona and mother of Ashwatthama."@en ;
+    skos:exactMatch wd:Q106948922 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/List_of_characters_in_the_Mahabharata> .
+
+mbh:ashwatthama a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:warrior-brahmins ;
+    skos:prefLabel "Ashwatthama"@en, "अश्वत्थामन्"@sa-Deva, "Aśvatthāman"@sa-Latn ;
+    skos:altLabel "Drauni"@en, "अश्वत्थामा"@sa-Deva, "द्रौणि"@sa-Deva, "Aśvatthāmā"@sa-Latn, "Drauṇi"@sa-Latn ;
+    skos:hiddenLabel "Ashvatthama"@en, "Ashwathama"@en, "Ashwatthaman"@en, "Aswatthama"@en ;
+    skos:definition "Son of Drona and Kripi, born with a gem in his forehead, who fought for the Kauravas; after Duryodhana fell he raided the sleeping Pandava camp by night and killed Dhrishtadyumna, Shikhandi and the five sons of Draupadi, then loosed a weapon at the unborn Parikshit."@en ;
+    skos:note "Duryodhana made him the last Kaurava commander on the night of day 18. Krishna cursed him to wander the earth for three thousand years, bleeding and alone, and took the gem from his forehead. Counted among the immortals (chiranjivis)."@en ;
+    mbhx:childOf mbh:drona, mbh:kripi ;
+    mbhx:studentOf mbh:drona ;
+    skos:exactMatch wd:Q2044550, dbr:Ashvatthama ;
+    foaf:isPrimaryTopicOf wp:Ashvatthama .
+
+# 4.14 Sutas
+
+mbh:sanjaya a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sutas ;
+    skos:prefLabel "Sanjaya"@en, "सञ्जय"@sa-Deva, "Sañjaya"@sa-Latn ;
+    skos:altLabel "Gavalgani"@en, "Gāvalgaṇi"@sa-Latn ;
+    skos:hiddenLabel "Sanjay"@en ;
+    skos:definition "Son of Gavalgana, charioteer, minister and envoy of Dhritarashtra, to whom he narrates the eighteen days of the war with the divine sight Vyasa granted him; the Bhagavad Gita reaches the reader in his words."@en ;
+    skos:note "Before the war he carried Dhritarashtra's message to the Pandavas. Satyaki captured him on the last day and Vyasa secured his release. He went with Dhritarashtra into the forest and survived the fire."@en ;
+    mbhx:charioteerOf mbh:dhritarashtra ;
+    skos:exactMatch wd:Q2389469, dbr:Sanjaya ;
+    foaf:isPrimaryTopicOf wp:Sanjaya .
+
+mbh:ugrashravas a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sutas ;
+    skos:prefLabel "Ugrashravas"@en, "उग्रश्रवस्"@sa-Deva, "Ugraśravas"@sa-Latn ;
+    skos:altLabel "Sauti"@en, "Ugrashravas Sauti"@en, "सौति"@sa-Deva, "Sauti"@sa-Latn ;
+    skos:hiddenLabel "Ugrasrava"@en, "Ugrasravas"@en, "Souti"@en ;
+    skos:definition "Bard, son of the suta Lomaharshana, who recites the whole Mahabharata to Shaunaka and the sages of the Naimisha forest as he heard it from Vaishampayana at Janamejaya's sacrifice; the outermost narrator of the epic."@en ;
+    skos:exactMatch wd:Q2075682, dbr:Ugrashravas ;
+    foaf:isPrimaryTopicOf wp:Ugrashravas .
+
+mbh:adhiratha a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sutas ;
+    skos:prefLabel "Adhiratha"@en, "अधिरथ"@sa-Deva, "Adhiratha"@sa-Latn ;
+    skos:hiddenLabel "Adiratha"@en, "Adhirath"@en ;
+    skos:definition "Charioteer of Dhritarashtra and husband of Radha, who found the infant Karna floating in a basket on the river and raised him as his son."@en ;
+    mbhx:spouseOf mbh:radha ;
+    mbhx:charioteerOf mbh:dhritarashtra ;
+    skos:exactMatch wd:Q2472652 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/List_of_characters_in_the_Mahabharata> .
+
+mbh:radha a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:sutas ;
+    skos:prefLabel "Radha (foster mother of Karna)"@en, "राधा"@sa-Deva, "Rādhā"@sa-Latn ;
+    skos:definition "Wife of the charioteer Adhiratha and foster mother of Karna, who is called Radheya after her."@en ;
+    skos:scopeNote "Not the Radha of the Krishna legends, who does not appear in the Mahabharata."@en ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/List_of_characters_in_the_Mahabharata> .
+
+# 4.15 Deities and celestial beings
+
+mbh:vishnu a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:deities ;
+    skos:prefLabel "Vishnu"@en, "विष्णु"@sa-Deva, "Viṣṇu"@sa-Latn ;
+    skos:altLabel "Narayana"@en, "Hari"@en, "नारायण"@sa-Deva, "Nārāyaṇa"@sa-Latn ;
+    skos:hiddenLabel "Visnu"@en, "Bishnu"@en ;
+    skos:definition "The preserver god, present in the epic through his avatars Krishna and Parashurama and invoked as Narayana."@en ;
+    skos:exactMatch wd:Q11380, dbr:Vishnu ;
+    foaf:isPrimaryTopicOf wp:Vishnu .
+
+mbh:shiva a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:deities ;
+    skos:prefLabel "Shiva"@en, "शिव"@sa-Deva, "Śiva"@sa-Latn ;
+    skos:altLabel "Mahadeva"@en, "Rudra"@en, "Shankara"@en, "महादेव"@sa-Deva, "Mahādeva"@sa-Latn, "Rudra"@sa-Latn ;
+    skos:hiddenLabel "Siva"@en, "Shiv"@en ;
+    skos:definition "God who tests Arjuna in the form of a mountain hunter and gives him the Pashupata weapon, grants Jayadratha the boon that holds the Pandavas back on day 13, grants Amba the promise of her revenge, and lends Ashwatthama his power for the night raid."@en ;
+    skos:exactMatch wd:Q11378, dbr:Shiva ;
+    foaf:isPrimaryTopicOf wp:Shiva .
+
+mbh:indra a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:deities ;
+    skos:prefLabel "Indra"@en, "इन्द्र"@sa-Deva, "Indra"@sa-Latn ;
+    skos:altLabel "Shakra"@en, "Vasava"@en, "Purandara"@en, "शक्र"@sa-Deva, "Śakra"@sa-Latn, "Vāsava"@sa-Latn ;
+    skos:definition "King of the gods and father of Arjuna, whom he hosts in heaven during the exile; disguised as a Brahmin he takes Karna's armour and earrings in exchange for a spear that can be used only once."@en ;
+    skos:note "He fought Arjuna and Krishna at the burning of the Khandava forest to protect his friend Takshaka's home. The Pandavas' capital Indraprastha is named after him."@en ;
+    skos:exactMatch wd:Q128335, dbr:Indra ;
+    foaf:isPrimaryTopicOf wp:Indra .
+
+mbh:surya a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:deities ;
+    skos:prefLabel "Surya"@en, "सूर्य"@sa-Deva, "Sūrya"@sa-Latn ;
+    skos:altLabel "Aditya"@en, "Vivasvan"@en, "आदित्य"@sa-Deva, "Āditya"@sa-Latn ;
+    skos:definition "The sun god, father of Karna by Kunti, who gave Yudhishthira the inexhaustible vessel for the exile and warned Karna of Indra's trick."@en ;
+    skos:exactMatch wd:Q204418, dbr:Surya ;
+    foaf:isPrimaryTopicOf wp:Surya .
+
+mbh:vayu a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:deities ;
+    skos:prefLabel "Vayu"@en, "वायु"@sa-Deva, "Vāyu"@sa-Latn ;
+    skos:altLabel "Pavana"@en, "Maruta"@en, "पवन"@sa-Deva, "Pavana"@sa-Latn ;
+    skos:definition "The wind god, father of Bhima by Kunti and of Hanuman."@en ;
+    skos:exactMatch wd:Q473731, dbr:Vayu ;
+    foaf:isPrimaryTopicOf wp:Vayu .
+
+mbh:dharma a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:deities ;
+    skos:prefLabel "Dharma"@en, "धर्म"@sa-Deva, "Dharma"@sa-Latn ;
+    skos:altLabel "Yama"@en, "Dharmadeva"@en, "Yama Dharmaraja"@en, "यम"@sa-Deva, "Yama"@sa-Latn, "Dharmadeva"@sa-Latn ;
+    skos:definition "God of righteousness, identified with Yama, the lord of the dead; father of Yudhishthira by Kunti, incarnate in Vidura, and the tester of Yudhishthira as the Yaksha at the lake and as the dog on the final journey."@en ;
+    skos:scopeNote "The Wikipedia synopsis names the father of Yudhishthira as Dharma and the dog as Yama. This scheme treats them as one being, as the epic does, and maps the concept to Yama with closeMatch because the Wikidata item covers Yama in all his roles."@en ;
+    skos:closeMatch wd:Q45097, dbr:Yama ;
+    rdfs:seeAlso wp:Yama .
+
+mbh:ashvins a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:deities ;
+    skos:prefLabel "Ashvins"@en, "अश्विनौ"@sa-Deva, "Aśvinau"@sa-Latn ;
+    skos:altLabel "Ashwini Kumaras"@en, "Nasatya and Dasra"@en, "अश्विनीकुमार"@sa-Deva, "Nāsatya"@sa-Latn, "Dasra"@sa-Latn ;
+    skos:hiddenLabel "Ashwins"@en, "Asvins"@en ;
+    skos:definition "The twin horse-headed gods of healing, fathers of the twins Nakula and Sahadeva by Madri."@en ;
+    skos:scopeNote "Modelled as one concept because the epic treats the twins as a pair in this role."@en ;
+    skos:exactMatch wd:Q726593, dbr:Ashvins ;
+    foaf:isPrimaryTopicOf wp:Ashvins .
+
+mbh:agni a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:deities ;
+    skos:prefLabel "Agni"@en, "अग्नि"@sa-Deva, "Agni"@sa-Latn ;
+    skos:altLabel "Vahni"@en, "Hutashana"@en, "Vahni"@sa-Latn ;
+    skos:definition "The fire god, who asked Arjuna and Krishna to let him consume the Khandava forest and rewarded them with the bow Gandiva, Arjuna's chariot and inexhaustible quivers, and Krishna's discus."@en ;
+    skos:exactMatch wd:Q394867, dbr:Agni ;
+    foaf:isPrimaryTopicOf wp:Agni .
+
+mbh:ganga a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:deities ;
+    skos:prefLabel "Ganga"@en, "गङ्गा"@sa-Deva, "Gaṅgā"@sa-Latn ;
+    skos:altLabel "Jahnavi"@en, "Bhagirathi"@en, "Jāhnavī"@sa-Latn, "Bhāgīrathī"@sa-Latn ;
+    skos:hiddenLabel "Ganges"@en, "Ganga Devi"@en ;
+    skos:definition "The river goddess, first wife of Shantanu and mother of Bhishma, whom she raised and had taught before returning him to his father."@en ;
+    skos:exactMatch wd:Q580113, <http://dbpedia.org/resource/Ganga_(goddess)> ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Ganga_(goddess)> .
+
+mbh:ganesha a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:deities ;
+    skos:prefLabel "Ganesha"@en, "गणेश"@sa-Deva, "Gaṇeśa"@sa-Latn ;
+    skos:altLabel "Ganapati"@en, "Vinayaka"@en, "गणपति"@sa-Deva, "Gaṇapati"@sa-Latn, "Vināyaka"@sa-Latn ;
+    skos:hiddenLabel "Ganesh"@en, "Ganapathi"@en ;
+    skos:definition "The elephant-headed god who, in a tradition recorded in the first book of the epic, wrote the Mahabharata down as Vyasa dictated it, on condition that Vyasa never pause."@en ;
+    skos:exactMatch wd:Q1579, dbr:Ganesha ;
+    foaf:isPrimaryTopicOf wp:Ganesha .
+
+mbh:hanuman a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:deities ;
+    skos:prefLabel "Hanuman"@en, "हनुमत्"@sa-Deva, "Hanumat"@sa-Latn ;
+    skos:altLabel "Maruti"@en, "Anjaneya"@en, "हनुमान्"@sa-Deva, "Hanumān"@sa-Latn, "Māruti"@sa-Latn, "Āñjaneya"@sa-Latn ;
+    skos:hiddenLabel "Hanumaan"@en, "Hanumanta"@en ;
+    skos:definition "The monkey god of the Ramayana, son of Vayu and so brother of Bhima; he humbles Bhima in the forest by asking him to lift his tail, and rides on Arjuna's banner through the war."@en ;
+    skos:note "Counted among the immortals (chiranjivis)."@en ;
+    mbhx:childOf mbh:vayu ;
+    skos:exactMatch wd:Q188618, dbr:Hanuman ;
+    foaf:isPrimaryTopicOf wp:Hanuman .
+
+mbh:urvashi a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:deities ;
+    skos:prefLabel "Urvashi"@en, "उर्वशी"@sa-Deva, "Urvaśī"@sa-Latn ;
+    skos:hiddenLabel "Urvasi"@en ;
+    skos:definition "Celestial nymph who desired Arjuna in Indra's heaven; when he refused her as an ancestress of his line she cursed him to lose his manhood, a curse Indra reduced to the one year Arjuna spent as Brihannala."@en ;
+    mbhx:cursed mbh:arjuna ;
+    skos:exactMatch wd:Q2307799, dbr:Urvashi ;
+    foaf:isPrimaryTopicOf wp:Urvashi .
+
+# 4.16 Rakshasas, Nagas and Asuras
+
+mbh:hidimba a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:rakshasas ;
+    skos:prefLabel "Hidimba"@en, "हिडिम्ब"@sa-Deva, "Hiḍimba"@sa-Latn ;
+    skos:hiddenLabel "Hidimb"@en, "Hidimbasura"@en ;
+    skos:definition "Man-eating rakshasa of the forest the Pandavas entered after the house of lac; he sent his sister Hidimbi to fetch the sleepers and was killed by Bhima when she fell in love with him instead."@en ;
+    mbhx:killedBy mbh:bhima ;
+    skos:exactMatch wd:Q122430, dbr:Hidimba ;
+    foaf:isPrimaryTopicOf wp:Hidimba .
+
+mbh:bakasura a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:rakshasas ;
+    skos:prefLabel "Bakasura"@en, "बकासुर"@sa-Deva, "Bakāsura"@sa-Latn ;
+    skos:altLabel "Baka"@en, "बक"@sa-Deva, "Baka"@sa-Latn ;
+    skos:hiddenLabel "Vakasura"@en, "Bakasur"@en ;
+    skos:definition "Rakshasa who exacted a cartload of food and a human being from the town of Ekachakra every day; Bhima took the place of the Brahmin family's victim and killed him."@en ;
+    mbhx:siblingOf mbh:kirmira ;
+    mbhx:killedBy mbh:bhima ;
+    skos:exactMatch wd:Q2724067, dbr:Bakasura ;
+    foaf:isPrimaryTopicOf wp:Bakasura .
+
+mbh:kirmira a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:rakshasas ;
+    skos:prefLabel "Kirmira"@en, "किर्मीर"@sa-Deva, "Kirmīra"@sa-Latn ;
+    skos:hiddenLabel "Kirmeera"@en ;
+    skos:definition "Rakshasa of the Kamyaka forest, brother of Bakasura and friend of Hidimba, who sought revenge on Bhima at the start of the exile and was killed by him."@en ;
+    mbhx:killedBy mbh:bhima ;
+    skos:exactMatch wd:Q6415922, dbr:Kirmira ;
+    foaf:isPrimaryTopicOf wp:Kirmira .
+
+mbh:jatasura a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:rakshasas ;
+    skos:prefLabel "Jatasura"@en, "जटासुर"@sa-Deva, "Jaṭāsura"@sa-Latn ;
+    skos:hiddenLabel "Jatasur"@en ;
+    skos:definition "Rakshasa who lived with the Pandavas in exile disguised as a Brahmin, carried off Draupadi, Yudhishthira and the twins while Bhima was away, and was killed by Bhima."@en ;
+    mbhx:killedBy mbh:bhima ;
+    skos:exactMatch wd:Q6164511, dbr:Jatasura ;
+    foaf:isPrimaryTopicOf wp:Jatasura .
+
+mbh:alambusha a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:rakshasas ;
+    skos:prefLabel "Alambusha"@en, "अलम्बुष"@sa-Deva, "Alambuṣa"@sa-Latn ;
+    skos:hiddenLabel "Alambush"@en, "Alamvusha"@en ;
+    skos:definition "Rakshasa who fought for the Kauravas, killed Iravan on day 8 and was killed by Ghatotkacha in the night battle of day 14."@en ;
+    mbhx:killedBy mbh:ghatotkacha ;
+    mbhx:fellOnWarDay 14 ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/List_of_characters_in_the_Mahabharata> .
+
+mbh:takshaka a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:nagas ;
+    skos:prefLabel "Takshaka"@en, "तक्षक"@sa-Deva, "Takṣaka"@sa-Latn ;
+    skos:hiddenLabel "Taksaka"@en, "Takshak"@en ;
+    skos:definition "Serpent king and friend of Indra, who lived in the Khandava forest before Arjuna burned it; he killed Parikshit to fulfil a sage's curse, and Astika saved him from Janamejaya's snake sacrifice."@en ;
+    skos:exactMatch wd:Q2633766, dbr:Takshaka ;
+    foaf:isPrimaryTopicOf wp:Takshaka .
+
+mbh:maya a mbhx:Character, skos:Concept ;
+    skos:inScheme mb:characters ;
+    skos:broader mbh:asuras ;
+    skos:prefLabel "Maya"@en, "मय"@sa-Deva, "Maya"@sa-Latn ;
+    skos:altLabel "Mayasura"@en, "Maya Danava"@en, "मयासुर"@sa-Deva, "Mayāsura"@sa-Latn ;
+    skos:hiddenLabel "Maya the architect"@en ;
+    skos:definition "Architect of the Danavas, spared by Arjuna at the burning of the Khandava forest, who built the Pandavas' assembly hall at Indraprastha in gratitude; Duryodhana's humiliation in that hall led to the dice game."@en ;
+    skos:exactMatch wd:Q2723049, dbr:Mayasura ;
+    foaf:isPrimaryTopicOf wp:Mayasura .
+
+# ---------------------------------------------------------------------------
+# 5. Collections
+# ---------------------------------------------------------------------------
+# Ordered collections state both skos:memberList and skos:member, so that a
+# consumer without SKOS inference sees the membership (S35 entails it).
+
+mbh:coll-pandavas-by-birth a skos:OrderedCollection ;
+    skos:inScheme mb:characters ;
+    skos:prefLabel "The five Pandavas in order of birth"@en ;
+    skos:definition "Yudhishthira, Bhima, Arjuna, Nakula and Sahadeva, eldest first. The twins Nakula and Sahadeva are born together; the epic names Nakula first."@en ;
+    skos:memberList ( mbh:yudhishthira mbh:bhima mbh:arjuna mbh:nakula mbh:sahadeva ) ;
+    skos:member mbh:yudhishthira, mbh:bhima, mbh:arjuna, mbh:nakula, mbh:sahadeva .
+
+mbh:coll-upapandavas-by-father a skos:OrderedCollection ;
+    skos:inScheme mb:characters ;
+    skos:prefLabel "The sons of Draupadi in the order of their fathers' birth"@en ;
+    skos:definition "Prativindhya (by Yudhishthira), Sutasoma (Bhima), Shrutakarma (Arjuna), Shatanika (Nakula) and Shrutasena (Sahadeva)."@en ;
+    skos:memberList ( mbh:prativindhya mbh:sutasoma mbh:shrutakarma mbh:shatanika mbh:shrutasena ) ;
+    skos:member mbh:prativindhya, mbh:sutasoma, mbh:shrutakarma, mbh:shatanika, mbh:shrutasena .
+
+mbh:coll-kaurava-commanders a skos:OrderedCollection ;
+    skos:inScheme mb:characters ;
+    skos:prefLabel "Commanders-in-chief of the Kaurava army, in sequence"@en ;
+    skos:definition "Bhishma (days 1 to 10), Drona (days 11 to 15), Karna (days 16 and 17), Shalya (day 18) and Ashwatthama (the night after day 18). Dhrishtadyumna commanded the Pandava army throughout."@en ;
+    skos:memberList ( mbh:bhishma mbh:drona mbh:karna mbh:shalya mbh:ashwatthama ) ;
+    skos:member mbh:bhishma, mbh:drona, mbh:karna, mbh:shalya, mbh:ashwatthama .
+
+mbh:coll-children-of-kunti a skos:Collection ;
+    skos:inScheme mb:characters ;
+    skos:prefLabel "Children of Kunti"@en ;
+    skos:altLabel "Kaunteyas"@en ;
+    skos:definition "Kunti's four sons: Karna, born before her marriage and raised by others, and the three elder Pandavas. Karna learns of the kinship only from Krishna and Kunti before the war."@en ;
+    skos:member mbh:karna, mbh:yudhishthira, mbh:bhima, mbh:arjuna .
+
+mbh:coll-pandava-side a skos:Collection ;
+    skos:inScheme mb:characters ;
+    skos:prefLabel "Kurukshetra war: the Pandava side"@en ;
+    skos:definition "Characters in this scheme who took the field for the Pandavas, and Krishna, who served as Arjuna's charioteer without fighting."@en ;
+    skos:member mbh:yudhishthira, mbh:bhima, mbh:arjuna, mbh:nakula, mbh:sahadeva, mbh:krishna,
+                mbh:abhimanyu, mbh:ghatotkacha, mbh:iravan,
+                mbh:prativindhya, mbh:sutasoma, mbh:shrutakarma, mbh:shatanika, mbh:shrutasena,
+                mbh:satyaki, mbh:drupada, mbh:dhrishtadyumna, mbh:shikhandi, mbh:yudhamanyu, mbh:uttamaujas,
+                mbh:virata, mbh:uttara, mbh:dhrishtaketu, mbh:yuyutsu .
+
+mbh:coll-kaurava-side a skos:Collection ;
+    skos:inScheme mb:characters ;
+    skos:prefLabel "Kurukshetra war: the Kaurava side"@en ;
+    skos:definition "Characters in this scheme who took the field for Duryodhana."@en ;
+    skos:member mbh:duryodhana, mbh:dushasana, mbh:vikarna, mbh:lakshmana-kumara, mbh:durmasena,
+                mbh:bhishma, mbh:drona, mbh:kripa, mbh:ashwatthama,
+                mbh:karna, mbh:vrishasena, mbh:shalya, mbh:shakuni, mbh:uluka,
+                mbh:jayadratha, mbh:bhagadatta, mbh:susharma, mbh:sudakshina,
+                mbh:bahlika, mbh:somadatta, mbh:bhurishravas, mbh:kritavarma, mbh:alambusha .
+
+mbh:coll-stayed-out a skos:Collection ;
+    skos:inScheme mb:characters ;
+    skos:prefLabel "Warriors who took no part in the war"@en ;
+    skos:definition "Balarama, who left on pilgrimage rather than fight his students on both sides, and Rukmi, whom both sides refused."@en ;
+    skos:member mbh:balarama, mbh:rukmi .
+
+mbh:coll-survivors a skos:Collection ;
+    skos:inScheme mb:characters ;
+    skos:prefLabel "Survivors of the Kurukshetra war"@en ;
+    skos:definition "The combatants alive at the end of the eighteen days, as the Wikipedia synopsis lists them: the five Pandavas, Satyaki, Kripa, Ashwatthama, Kritavarma, Yuyutsu and Krishna."@en ;
+    skos:member mbh:yudhishthira, mbh:bhima, mbh:arjuna, mbh:nakula, mbh:sahadeva,
+                mbh:krishna, mbh:satyaki, mbh:yuyutsu, mbh:ashwatthama, mbh:kripa, mbh:kritavarma .
+
+mbh:coll-narrative-frame a skos:Collection ;
+    skos:inScheme mb:characters ;
+    skos:prefLabel "The narrative frame of the Mahabharata"@en ;
+    skos:definition "The tellers and hearers through whom the epic reaches the reader. Outer frame: the bard Ugrashravas recites to Shaunaka and the sages of the Naimisha forest. Inner frame: Vaishampayana recites to Janamejaya at the snake sacrifice. Composition: Vyasa, with Ganesha as scribe in one tradition. Within the story: Sanjaya narrates the war to Dhritarashtra."@en ;
+    skos:member mbh:ugrashravas, mbh:shaunaka, mbh:vaishampayana, mbh:janamejaya,
+                mbh:vyasa, mbh:ganesha, mbh:sanjaya, mbh:dhritarashtra .
+
+mbh:coll-chiranjivis a skos:Collection ;
+    skos:inScheme mb:characters ;
+    skos:prefLabel "Immortals (chiranjivis) among the characters"@en ;
+    skos:altLabel "Chiranjivis"@en ;
+    skos:definition "Characters in this scheme whom Hindu tradition counts among the seven immortals: Ashwatthama, Kripa, Vyasa, Parashurama and Hanuman."@en ;
+    skos:member mbh:ashwatthama, mbh:kripa, mbh:vyasa, mbh:parashurama, mbh:hanuman .
+
+mbh:coll-virata-disguises a skos:Collection ;
+    skos:inScheme mb:characters ;
+    skos:prefLabel "The disguises at Virata's court"@en ;
+    skos:definition "The six who spent the thirteenth year of exile at the court of Matsya under assumed names: Yudhishthira as the courtier Kanka, Bhima as the cook Vallabha, Arjuna as the dance teacher Brihannala, Nakula as the horse keeper Granthika, Sahadeva as the cowherd Tantipala and Draupadi as the maid Sairandhri. The assumed names are alternative labels of each concept."@en ;
+    skos:member mbh:yudhishthira, mbh:bhima, mbh:arjuna, mbh:nakula, mbh:sahadeva, mbh:draupadi .
